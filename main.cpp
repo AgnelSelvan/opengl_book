@@ -18,7 +18,7 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "}\n\0";
 
 int main() { 
-  
+  // Initializing GLFW Library
   glfwInit();
   
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -26,30 +26,43 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+  // Creating a GLFW Window of width 500 and height 300 with title "Hello World"
   GLFWwindow* window = glfwCreateWindow(500, 300, "Hello World", NULL, NULL);
+  // If window creating failed
   if(window == NULL){
     std::cout << "GLFW Window create error" << std::endl;
     glfwTerminate();
     return -1;
   }
-
+  // To make sure all the drawing happing on window variable, so making it as current context
   glfwMakeContextCurrent(window);
 
+  // Load Glad so it configures OpenGL
   gladLoadGL();
 
+  // Creates a Vertex Shader and creating its reference
   GLuint vertextShader = glCreateShader(GL_VERTEX_SHADER);
+  // Loads the source code in rhe shader
   glShaderSource(vertextShader, 1, &vertexShaderSource, NULL);
+  // Compiles the shader
   glCompileShader(vertextShader);
 
+  // Creates a Fragment Shader and creating its reference
   GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  // Loads the source code in rhe shader
   glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+  // Compiles the shader
   glCompileShader(fragmentShader);
 
+  // Creates a empty program object
   GLuint shaderProgram = glCreateProgram();
+  // Attach the shaders to the program
   glAttachShader(shaderProgram, vertextShader);
   glAttachShader(shaderProgram, fragmentShader);
+  // Based on the vertex, fragment or geometry shader attached to the program, it will create a executable that run on respective processor
   glLinkProgram(shaderProgram);
 
+  // Delete the shader once after linking
   glDeleteShader(vertextShader);
   glDeleteShader(fragmentShader);
 
