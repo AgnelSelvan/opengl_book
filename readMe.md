@@ -1,1 +1,1 @@
-### This is an example of creating a new window using GLFW and paint to screen
+### This is an example of creating a new window using SDL2 and OpenGL Setup
