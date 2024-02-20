@@ -7,6 +7,54 @@ int gScreenHeight = 300;
 SDL_Window* gGraphicsApplicationWindow = nullptr;
 SDL_GLContext gOpenGLContext = nullptr;
 bool gQuit = false;
+//VAO
+GLuint gVertexArrayObject = 0;
+//VBO
+GLuint gVertexBufferObject = 0;
+GLuint gGraphicsPipelineShaderProgram = 0;
+
+const std::string gVertexShaderSource = 
+  "#version 410 core\n"
+  "in vec4 position;\n"
+  "void main(){\n"
+    "gl_Position = vec4(position.x, position.y, position.z, position.w);\n"
+  "}\n";
+
+const std::string gFragmentShaderSource = 
+  "#version 410 core\n"
+  "out vec4 color;\n"
+  "void main(){\n"
+    "color = vec4(1.0f, 0.5f, 0.0f, 1.0f);\n"
+  "}\n";
+
+GLuint compileShader(GLuint type, const std::string& shaderSource){
+  GLuint shaderObject = glCreateShader(type);
+  
+  const char* src = shaderSource.c_str();
+  glShaderSource(shaderObject, 1, &src, nullptr);
+  glCompileShader(shaderObject);
+
+  return shaderObject;
+}
+
+GLuint createShaderProgram(const std::string& vertexShaderSource, const std::string& fragmentShaderSource){
+  GLuint shaderProgram = glCreateProgram();
+
+  GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
+  GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
+
+  glValidateProgram(shaderProgram);
+
+  return shaderProgram;
+}
+
+void createGraphicsPipeline(){
+  gGraphicsPipelineShaderProgram = createShaderProgram(gVertexShaderSource, gFragmentShaderSource);
+}
 
 // Gets OpenGL Current Version
 void getOpenGLVersion(){
@@ -30,7 +78,7 @@ void initializeProgram(){
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-  gGraphicsApplicationWindow = SDL_CreateWindow("OPENGL using SDL2", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
+  gGraphicsApplicationWindow = SDL_CreateWindow("OPENGL using SDL2", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   if(gGraphicsApplicationWindow == nullptr){
     std::cout << "SDL2 window creating failed" << std::endl;
     exit(1);
@@ -64,9 +112,23 @@ void input(){
   
 }
 
-void preDraw(){}
+void preDraw(){
+  
 
-void draw(){}
+  glViewport(0, 0, gScreenWidth, gScreenHeight);
+  glClearColor(1.f, 1.f, 0.f, 1.f);
+  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+  glUseProgram(gGraphicsPipelineShaderProgram);
+
+}
+
+void draw(){
+  glBindVertexArray(gVertexArrayObject);
+  glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
+
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+}
 
 // Main Game Engine Entry point
 void mainLoop(){
@@ -89,9 +151,43 @@ void cleanUp(){
   SDL_Quit();
 }
 
+void vertexSpecification(){
+  // This data lives on CPU
+  const std::vector<GLfloat> vertexPosition {
+    -0.8f, -0.8f, 0.0f,
+    0.8f, -0.8f, 0.0f,
+    0.0f, 0.8f, 0.0f,
+  };
+
+  //VAO
+  glGenVertexArrays(1, &gVertexArrayObject);
+  glBindVertexArray(gVertexArrayObject);
+  
+  //VBO
+  glGenBuffers(1, &gVertexBufferObject);
+  glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
+  glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(float), vertexPosition.data(), GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(
+    0, 
+    3,
+    GL_FLOAT,
+    GL_FALSE,
+    0,
+    (void*)0
+  );
+  glBindVertexArray(0);
+  glDisableVertexAttribArray(0);
+
+}
+
+
 int main(int argc, char const *argv[])
 {
   initializeProgram();
+  vertexSpecification();
+  createGraphicsPipeline();
   mainLoop();
   cleanUp();
   return 0;
