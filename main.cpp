@@ -66,11 +66,13 @@ void getOpenGLVersion(){
 
 // Initialize SDL2, OpenGL and GLAD
 void initializeProgram(){
+  // Checks if SDL2 can open
   if(SDL_Init(SDL_INIT_VIDEO) < 0){
     std::cout << "SDL2 failed to load video subsystem" << std::endl;
     exit(1);
   }
 
+  // Setting up SDL and OpenGL related configurations
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
@@ -78,23 +80,28 @@ void initializeProgram(){
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+  // Creates a new window
   gGraphicsApplicationWindow = SDL_CreateWindow("OPENGL using SDL2", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+  // Exit the app on window creation failed
   if(gGraphicsApplicationWindow == nullptr){
     std::cout << "SDL2 window creating failed" << std::endl;
     exit(1);
   }
 
+  // Setting up the OpenGL context to current Window and returns the contextt
   gOpenGLContext = SDL_GL_CreateContext(gGraphicsApplicationWindow);
+  // Exit the app if getting current context failed
   if(gOpenGLContext == nullptr){
     std::cout << "OpenGL Current context not available" << std::endl;
     exit(1);
   }
 
+  // If Glad Loads fails quitting the App
   if(!gladLoadGLLoader(SDL_GL_GetProcAddress)){
     std::cout << "Error in lading Glad" << std::endl;
     exit(1);
   }
-
+  // responsible for printing the OpenGL Version the project uses
   getOpenGLVersion();
 }
 
@@ -113,20 +120,24 @@ void input(){
 }
 
 void preDraw(){
-  
-
+  // Making the OpenGL Viewport as per the window created
   glViewport(0, 0, gScreenWidth, gScreenHeight);
+  
+  // RGBA values, Used for clearing the buffer color values
   glClearColor(1.f, 1.f, 0.f, 1.f);
+  // Clear the buffer values
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
+  // Using rhe Shader Program
   glUseProgram(gGraphicsPipelineShaderProgram);
 
 }
 
 void draw(){
+  // Binds Vertex Array Objects
   glBindVertexArray(gVertexArrayObject);
+  // Binds Vertex Data
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-
+  // Draws the triangle
   glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -134,10 +145,13 @@ void draw(){
 void mainLoop(){
   while (!gQuit)
   {
+    // resposible for checking user inputs
     input();
 
+    // resposible for handling any requirements before drawing on screen
     preDraw();
 
+    // Responsible for drawing on screen
     draw();
 
     // Swapping background Frame to current frame
@@ -147,7 +161,9 @@ void mainLoop(){
 }
 
 void cleanUp(){
+  // Clear the Window loaded on memory
   SDL_DestroyWindow(gGraphicsApplicationWindow);
+  // quits the window
   SDL_Quit();
 }
 
@@ -185,10 +201,16 @@ void vertexSpecification(){
 
 int main(int argc, char const *argv[])
 {
+  // responsible for Initializing GLAD, OpenGL and SDL2
   initializeProgram();
+  // Responsible for loading the data from CPU to Graphics Memory that can be vertex, texture data, color and etc
   vertexSpecification();
+  // responsible for setting the Graphics pipeling. 
+  // Loading the shaders stuffs, creting program and etc
   createGraphicsPipeline();
+  // responsible for painting on the screen
   mainLoop();
+  // Destroys window.
   cleanUp();
   return 0;
 }
