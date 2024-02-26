@@ -1,1 +1,1 @@
-### This is an example of creating a simple triangle using OpenGL and shaders
+### This is an example of Loading a Shader from a File
