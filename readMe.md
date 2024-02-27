@@ -1,1 +1,1 @@
-### This is an example of Loading a Shader from a File
+### This is an example of Adding Colored triangle with multiple buffer object

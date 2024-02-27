@@ -12,6 +12,7 @@ bool gQuit = false;
 GLuint gVertexArrayObject = 0;
 //VBO
 GLuint gVertexBufferObject = 0;
+GLuint gVertexBufferObject2 = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 
 std::string loadShaderAsString(const std::string& filename){
@@ -179,6 +180,11 @@ void vertexSpecification(){
     0.8f, -0.8f, 0.0f,
     0.0f, 0.8f, 0.0f,
   };
+  const std::vector<GLfloat> vertexColors {
+    1.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,
+  };
 
   //VAO
   glGenVertexArrays(1, &gVertexArrayObject);
@@ -187,8 +193,9 @@ void vertexSpecification(){
   //VBO
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-  glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(float), vertexPosition.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GL_FLOAT), vertexPosition.data(), GL_STATIC_DRAW);
 
+  // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(
     0, 
@@ -198,8 +205,19 @@ void vertexSpecification(){
     0,
     (void*)0
   );
+
+  //VBO2 for colors
+  glGenBuffers(1, &gVertexBufferObject2);
+  glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject2);
+  glBufferData(GL_ARRAY_BUFFER, vertexColors.size() * sizeof(GL_FLOAT), vertexColors.data(), GL_STATIC_DRAW);
+  
+  // Loading color buffer on 1 location on vertex shader
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
   glBindVertexArray(0);
   glDisableVertexAttribArray(0);
+  glDisableVertexAttribArray(1);
 
 }
 
