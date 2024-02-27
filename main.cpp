@@ -143,7 +143,7 @@ void draw(){
   // Binds Vertex Data
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
   // Draws the triangle
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 // Main Game Engine Entry point
@@ -175,11 +175,19 @@ void cleanUp(){
 void vertexSpecification(){
   // This data lives on CPU
   const std::vector<GLfloat> vertexData {
-    -0.8f, -0.8f, 0.0f,  // Left vertex position
+    // First Triangle
+    -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
     1.0f, 0.0f, 0.0f,    // Color
-    0.8f, -0.8f, 0.0f,   // Right vertex position
+    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
     0.0f, 1.0f, 0.0f,    // Color
-    0.0f, 0.8f, 0.0f,    // Top vertex position
+    -0.5f, 0.5f, 0.0f,   // Top left vertex position
+    0.0f, 0.0f, 1.0f,    // Color
+    // Second triangle
+    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    0.5f, 0.5f, 0.0f,  // Top right vertex position
+    1.0f, 0.0f, 0.0f,    // Color
+    -0.5f, 0.5f, 0.0f,   // Top left vertex position
     0.0f, 0.0f, 1.0f,    // Color
   };
 

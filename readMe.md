@@ -1,1 +1,1 @@
-### This is an example of Adding Colored triangle with Single Vertext buffer object
+### This is an example of rendering a QUAD
