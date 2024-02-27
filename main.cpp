@@ -12,7 +12,6 @@ bool gQuit = false;
 GLuint gVertexArrayObject = 0;
 //VBO
 GLuint gVertexBufferObject = 0;
-GLuint gVertexBufferObject2 = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 
 std::string loadShaderAsString(const std::string& filename){
@@ -175,15 +174,13 @@ void cleanUp(){
 
 void vertexSpecification(){
   // This data lives on CPU
-  const std::vector<GLfloat> vertexPosition {
-    -0.8f, -0.8f, 0.0f,
-    0.8f, -0.8f, 0.0f,
-    0.0f, 0.8f, 0.0f,
-  };
-  const std::vector<GLfloat> vertexColors {
-    1.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,
+  const std::vector<GLfloat> vertexData {
+    -0.8f, -0.8f, 0.0f,  // Left vertex position
+    1.0f, 0.0f, 0.0f,    // Color
+    0.8f, -0.8f, 0.0f,   // Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    0.0f, 0.8f, 0.0f,    // Top vertex position
+    0.0f, 0.0f, 1.0f,    // Color
   };
 
   //VAO
@@ -193,7 +190,7 @@ void vertexSpecification(){
   //VBO
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-  glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GL_FLOAT), vertexPosition.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GL_FLOAT), vertexData.data(), GL_STATIC_DRAW);
 
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
@@ -202,18 +199,13 @@ void vertexSpecification(){
     3,
     GL_FLOAT,
     GL_FALSE,
-    0,
+    sizeof(GL_FLOAT) * 6,
     (void*)0
   );
-
-  //VBO2 for colors
-  glGenBuffers(1, &gVertexBufferObject2);
-  glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject2);
-  glBufferData(GL_ARRAY_BUFFER, vertexColors.size() * sizeof(GL_FLOAT), vertexColors.data(), GL_STATIC_DRAW);
-  
+ 
   // Loading color buffer on 1 location on vertex shader
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT)*6, (void*)(sizeof(GL_FLOAT) * 3));
 
   glBindVertexArray(0);
   glDisableVertexAttribArray(0);
