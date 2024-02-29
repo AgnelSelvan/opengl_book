@@ -16,6 +16,24 @@ GLuint gVertexBufferObject = 0;
 GLuint gIndexBufferObject = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 
+// Error Handling
+//Clear all the error
+static void glClearAllErrors(){
+  while (glGetError() != GL_NO_ERROR)
+  {}
+}
+// Check for OpenGL Error on which line and on which function
+static bool glCheckErrorStatus(const char* function, int line){
+  while (GLenum error = glGetError())
+  {
+    std::cout << "OpenGL Error: " << error << "\tLine: " << line << "\tfunction: " << function << std::endl;
+    return true;
+  }
+  return false;
+}
+// Macros for defining a method for error handling
+#define glCheck(x); glClearAllErrors(); x; glCheckErrorStatus(#x, __LINE__);
+
 std::string loadShaderAsString(const std::string& filename){
   std::string result = "";
 
@@ -143,10 +161,10 @@ void draw(){
   // Binds Vertex Array Objects
   glBindVertexArray(gVertexArrayObject);
   // Binds Vertex Data
-  glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
+  glCheck(glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject));
   // Draws the triangle
   // glDrawArrays(GL_TRIANGLES, 0, 6);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glCheck(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 }
 
 // Main Game Engine Entry point
