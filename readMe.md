@@ -1,1 +1,1 @@
-### This is an example of rendering a QUAD using Indexed Buffer Strategy - More effiencent than tutorial
+### This is an example of error handling in OpenGL
