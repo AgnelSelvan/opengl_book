@@ -1,1 +1,1 @@
-### This is an example of rendering a QUAD
+### This is an example of rendering a QUAD using Indexed Buffer Strategy - More effiencent than tutorial

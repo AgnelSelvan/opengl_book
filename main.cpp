@@ -12,6 +12,8 @@ bool gQuit = false;
 GLuint gVertexArrayObject = 0;
 //VBO
 GLuint gVertexBufferObject = 0;
+//IBO
+GLuint gIndexBufferObject = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 
 std::string loadShaderAsString(const std::string& filename){
@@ -143,7 +145,8 @@ void draw(){
   // Binds Vertex Data
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
   // Draws the triangle
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  // glDrawArrays(GL_TRIANGLES, 0, 6);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 // Main Game Engine Entry point
@@ -175,20 +178,18 @@ void cleanUp(){
 void vertexSpecification(){
   // This data lives on CPU
   const std::vector<GLfloat> vertexData {
-    // First Triangle
+    // 0 - Vertex
     -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
     1.0f, 0.0f, 0.0f,    // Color
+    // 1 - Vertex
     0.5f, -0.5f, 0.0f,   // bottom Right vertex position
     0.0f, 1.0f, 0.0f,    // Color
+    // 2 - Vertex
     -0.5f, 0.5f, 0.0f,   // Top left vertex position
     0.0f, 0.0f, 1.0f,    // Color
-    // Second triangle
-    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
-    0.0f, 1.0f, 0.0f,    // Color
+    // 3 - Vertex
     0.5f, 0.5f, 0.0f,  // Top right vertex position
     1.0f, 0.0f, 0.0f,    // Color
-    -0.5f, 0.5f, 0.0f,   // Top left vertex position
-    0.0f, 0.0f, 1.0f,    // Color
   };
 
   //VAO
@@ -199,6 +200,12 @@ void vertexSpecification(){
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
   glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GL_FLOAT), vertexData.data(), GL_STATIC_DRAW);
+
+  const std::vector<GLuint> indexBufferData {2,0,1,3,2,1};
+  //IBO i.e (EBO)
+  glGenBuffers(1, &gIndexBufferObject);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferData.size() * sizeof(GLuint), indexBufferData.data(), GL_STATIC_DRAW);
 
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
