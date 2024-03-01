@@ -15,6 +15,8 @@ GLuint gVertexBufferObject = 0;
 //IBO
 GLuint gIndexBufferObject = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
+// Global Uniform Variable sending data from CPU to GPU
+float gUOffset = 0.f;
 
 // Error Handling
 //Clear all the error
@@ -136,11 +138,20 @@ void input(){
   while (SDL_PollEvent(&e)!=0)
   {
     //e.type: 768 means on click escape
-    if(e.type == SDL_QUIT || e.type == 768){
+    if(e.type == SDL_QUIT){
       std::cout << "Bubyee!!" << std::endl;
       gQuit = true;
     }
   }
+
+  const Uint8 *state = SDL_GetKeyboardState(NULL);
+  if(state[SDL_SCANCODE_UP]){
+    gUOffset += .0001;
+  }
+  if(state[SDL_SCANCODE_DOWN]){
+    gUOffset -= .0001;
+  }
+  std::cout << " uOffset: " << gUOffset << std::endl;
   
 }
 
@@ -149,11 +160,18 @@ void preDraw(){
   glViewport(0, 0, gScreenWidth, gScreenHeight);
   
   // RGBA values, Used for clearing the buffer color values
-  glClearColor(1.f, 1.f, 0.f, 1.f);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
   // Clear the buffer values
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
   // Using rhe Shader Program
   glUseProgram(gGraphicsPipelineShaderProgram);
+  const GLchar* offsetName = "uOffset";
+  GLint location = glGetUniformLocation(gGraphicsPipelineShaderProgram, offsetName);
+  if(location >= 0){
+    glUniform1f(location, gUOffset);
+  }else{
+    std::cout << "Location not found! Please check " << offsetName << " is spelled correctly" << std::endl;
+  }
 
 }
 
