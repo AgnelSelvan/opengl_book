@@ -10,5 +10,8 @@ If you are a beginner and looking forward to learn OpenGL Please refer this repo
 - [This is an example of Adding Colored triangle with multiple buffer object](https://github.com/AgnelSelvan/opengl_documentation/tree/06)
 - [This is an example of Adding Colored triangle with Single Vertext buffer object](https://github.com/AgnelSelvan/opengl_documentation/tree/07)
 - [This is an example of rendering a QUAD](https://github.com/AgnelSelvan/opengl_documentation/tree/08)
+- [This is an example of rendering a QUAD using Indexed Buffer Strategy - More effiencent than previous](https://github.com/AgnelSelvan/opengl_documentation/tree/09)
+- [This is an example of error handling in OpenGL](https://github.com/AgnelSelvan/opengl_documentation/tree/10)
+- [Playing around with GLM Library](https://github.com/AgnelSelvan/opengl_documentation/tree/11)
 
 If you found this repo to be more useful please hit a star ⭐️ on the repository.
