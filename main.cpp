@@ -1,7 +1,9 @@
+#define GLM_ENABLE_EXPERIMENTA
 #include <iostream>
 #include <SDL2/SDL.h>
 #include<glad/glad.h>
 #include <fstream>
+#include <glm/gtc/matrix_transform.hpp>
 
 int gScreenWidth = 500;
 int gScreenHeight = 300;
@@ -15,8 +17,7 @@ GLuint gVertexBufferObject = 0;
 //IBO
 GLuint gIndexBufferObject = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
-// Global Uniform Variable sending data from CPU to GPU
-float gUOffset = 0.f;
+float gUOffset = 0.;
 
 // Error Handling
 //Clear all the error
@@ -146,12 +147,11 @@ void input(){
 
   const Uint8 *state = SDL_GetKeyboardState(NULL);
   if(state[SDL_SCANCODE_UP]){
-    gUOffset += .0001;
+    gUOffset += 0.0001;
   }
   if(state[SDL_SCANCODE_DOWN]){
-    gUOffset -= .0001;
+    gUOffset -= 0.0001;
   }
-  std::cout << " uOffset: " << gUOffset << std::endl;
   
 }
 
@@ -165,12 +165,20 @@ void preDraw(){
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
   // Using rhe Shader Program
   glUseProgram(gGraphicsPipelineShaderProgram);
-  const GLchar* offsetName = "uOffset";
-  GLint location = glGetUniformLocation(gGraphicsPipelineShaderProgram, offsetName);
-  if(location >= 0){
-    glUniform1f(location, gUOffset);
+
+  const GLchar* uniformName = "uModelMatrix";
+  // Getting Uniform Location from Shader
+  GLint mModelMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, uniformName);
+  // Converting local coordinate to world space cordinates
+  glm::mat4 translate = glm::translate(glm::mat4(1.), glm::vec3(0., gUOffset, 0.));
+  // If location found
+  if(mModelMatrixLocation >= 0){
+    // Passing World space cordinates to Shader
+    // Uniform is useful for passing data from CPU directly to GPU
+    glUniformMatrix4fv(mModelMatrixLocation, 1, GL_FALSE, &translate[0][0]);
   }else{
-    std::cout << "Location not found! Please check " << offsetName << " is spelled correctly" << std::endl;
+    std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
+    exit(EXIT_FAILURE);
   }
 
 }

@@ -1,3 +1,2 @@
-### This is an example of GLSL Uniform Variable
+### This is an example of changing Local coordinates to World Space
 
-##### Sending Data from CPU directly to GPU using Uniform Variable
