@@ -170,12 +170,27 @@ void preDraw(){
   // Getting Uniform Location from Shader
   GLint mModelMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, uniformName);
   // Converting local coordinate to world space cordinates
-  glm::mat4 translate = glm::translate(glm::mat4(1.), glm::vec3(0., gUOffset, 0.));
+  glm::mat4 translate = glm::translate(glm::mat4(1.), glm::vec3(0., 0., gUOffset));
   // If location found
   if(mModelMatrixLocation >= 0){
     // Passing World space cordinates to Shader
     // Uniform is useful for passing data from CPU directly to GPU
     glUniformMatrix4fv(mModelMatrixLocation, 1, GL_FALSE, &translate[0][0]);
+  }else{
+    std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  // Uniform name as defined in shader
+  uniformName = "uPerspectiveMatrix";
+  // perspective projection
+  glm::mat4 perspective = glm::perspective(glm::radians(90.0f), (float)gScreenWidth/(float)gScreenHeight, 0.1f, 10.0f);
+  // Getting Uniform Location from Shader
+  GLint perspectiveMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, uniformName);
+  // If location found
+  if(perspectiveMatrixLocation >= 0){
+    // Passing the projectioin matrix to Vertex shader
+    glUniformMatrix4fv(perspectiveMatrixLocation, 1, GL_FALSE, &perspective[0][0]);
   }else{
     std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
     exit(EXIT_FAILURE);
