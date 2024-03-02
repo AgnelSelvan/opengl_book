@@ -1,2 +1,2 @@
-### This is an example of how to implement perspective projection
+### This is an example of rotation matrix and scaling Matrix
 
