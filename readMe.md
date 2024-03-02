@@ -1,2 +1,2 @@
-### This is an example of changing Local coordinates to World Space
+### This is an example of how to implement perspective projection
 
