@@ -228,8 +228,8 @@ void draw(){
   // Binds Vertex Array Objects
   glBindVertexArray(gVertexArrayObject);
   // Draws the triangle
-  glDrawArrays(GL_TRIANGLES, 0, 24);
-  // glCheck(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+  // glDrawArrays(GL_TRIANGLES, 0, 24);
+  glCheck(glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0));
 }
 
 // Main Game Engine Entry point
@@ -261,61 +261,23 @@ void cleanUp(){
 void vertexSpecification(){
   // This data lives on CPU
   const std::vector<GLfloat> vertexData {
-    // FF First Triangle
+    // Front Face
+    -0.5f, 0.5f, 0.0f,   // Top left vertex position
+    0.0f, 0.0f, 1.0f,    // Color
+    0.5f, 0.5f, 0.0f,    // Top right vertex position
+    1.0f, 0.0f, 0.0f,    // Color
     -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
     1.0f, 0.0f, 0.0f,    // Color
     0.5f, -0.5f, 0.0f,   // bottom Right vertex position
     0.0f, 1.0f, 0.0f,    // Color
-    -0.5f, 0.5f, 0.0f,   // Top left vertex position
-    0.0f, 0.0f, 1.0f,    // Color
-    // FF Second triangle
-    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
-    0.0f, 1.0f, 0.0f,    // Color
-    0.5f, 0.5f, 0.0f,    // Top right vertex position
-    1.0f, 0.0f, 0.0f,    // Color
-    -0.5f, 0.5f, 0.0f,   // Top left vertex position
-    0.0f, 0.0f, 1.0f,    // Color
-    // RF Third triangle
-    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
-    0.0f, 1.0f, 0.0f,    // Color
-    0.5f, 0.5f, 0.0f,    // Top right vertex position
-    1.0f, 0.0f, 0.0f,    // Color
-    0.5f, 0.5f, -0.5f,   // R Top right vertex position
+    // Back Face
+    -0.5f, 0.5f, -0.5f,  // B Top left vertex position
+    1.0f, 1.0f, 0.0f,    // Color
+    0.5f, 0.5f, -0.5f,   // B Top right vertex position
     1.0f, 0.0f, 1.0f,    // Color
-    // RF Forth triangle
-    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
+    -0.5f, -0.5f, -0.5f, // B Bottom left vertex position
     0.0f, 1.0f, 0.0f,    // Color
-    0.5f, 0.5f, -0.5f,   // R Top right vertex position
-    1.0f, 1.0f, 0.0f,    // Color
-    0.5f, -0.5f, -0.5f,  // R bottom Right vertex position
-    0.0f, 1.0f, 1.0f,    // Color
-    // BF Fifth triangle
-    0.5f, 0.5f, -0.5f,   // R Top right vertex position
-    1.0f, 1.0f, 0.0f,    // Color
-    0.5f, -0.5f, -0.5f,  // R bottom Right vertex position
-    0.0f, 1.0f, 0.0f,    // Color
-    -0.5f, 0.5f, -0.5f,  // B Top right vertex position
-    1.0f, 1.0f, 0.0f,    // Color
-    // BF Sixth triangle
-    0.5f, -0.5f, -0.5f,  // R bottom Right vertex position
-    0.0f, 1.0f, 0.0f,    // Color
-    -0.5f, 0.5f, -0.5f,  // B Top right vertex position
-    1.0f, 0.0f, 0.0f,    // Color
-    -0.5f, -0.5f, -0.5f, // B Bottom right vertex position
-    0.0f, 1.0f, 0.0f,    // Color
-    // BF Seventh triangle
-    -0.5f, 0.5f, -0.5f,  // B Top right vertex position
-    1.0f, 0.0f, 0.8f,    // Color
-    -0.5f, -0.5f, -0.5f, // B Bottom right vertex position
-    0.0f, 1.0f, 0.1f,    // Color
-    -0.5f, 0.5f, 0.0f,   // Top left vertex position
-    0.0f, 0.0f, 1.0f,    // Color
-    // BF Eight triangle
-    -0.5f, 0.5f, 0.0f,   // Top left vertex position
-    0.0f, 0.0f, 1.0f,    // Color
-    -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
-    1.0f, 0.0f, 0.0f,    // Color
-    -0.5f, -0.5f, -0.5f, // B Bottom right vertex position
+    0.5f, -0.5f, -0.5f,  // B bottom Right vertex position
     0.0f, 1.0f, 1.0f,    // Color
   };
 
@@ -327,6 +289,22 @@ void vertexSpecification(){
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
   glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GL_FLOAT), vertexData.data(), GL_STATIC_DRAW);
+
+  //IBO
+  // Defining triangle cordinate for drawing the cube using common vertex
+  const std::vector<GLuint> indexBufferData {
+    //Front
+    0,1,2,1,2,3,
+    //Back
+    4,5,6,5,6,7,
+    //Right
+    1,5,3,5,3,7,
+    //Left
+    0,4,2,4,2,6  
+  };
+  glGenBuffers(1, &gIndexBufferObject);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferData.size() * sizeof(GLuint), indexBufferData.data(), GL_STATIC_DRAW);
 
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
