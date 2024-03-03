@@ -1,2 +1,2 @@
-### This is an example of rotation matrix and scaling Matrix
+### This is an example of a cube
 

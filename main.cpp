@@ -112,7 +112,7 @@ void initializeProgram(){
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
   // Creates a new window
-  gGraphicsApplicationWindow = SDL_CreateWindow("OPENGL using SDL2", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+  gGraphicsApplicationWindow = SDL_CreateWindow("OPENGL", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   // Exit the app on window creation failed
   if(gGraphicsApplicationWindow == nullptr){
     std::cout << "SDL2 window creating failed" << std::endl;
@@ -132,6 +132,8 @@ void initializeProgram(){
     std::cout << "Error in lading Glad" << std::endl;
     exit(1);
   }
+
+  glEnable(GL_DEPTH_TEST);
   // responsible for printing the OpenGL Version the project uses
   getOpenGLVersion();
 }
@@ -226,8 +228,8 @@ void draw(){
   // Binds Vertex Array Objects
   glBindVertexArray(gVertexArrayObject);
   // Draws the triangle
-  // glDrawArrays(GL_TRIANGLES, 0, 6);
-  glCheck(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+  glDrawArrays(GL_TRIANGLES, 0, 24);
+  // glCheck(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 }
 
 // Main Game Engine Entry point
@@ -259,18 +261,62 @@ void cleanUp(){
 void vertexSpecification(){
   // This data lives on CPU
   const std::vector<GLfloat> vertexData {
-    // 0 - Vertex
+    // FF First Triangle
     -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
     1.0f, 0.0f, 0.0f,    // Color
-    // 1 - Vertex
     0.5f, -0.5f, 0.0f,   // bottom Right vertex position
     0.0f, 1.0f, 0.0f,    // Color
-    // 2 - Vertex
     -0.5f, 0.5f, 0.0f,   // Top left vertex position
     0.0f, 0.0f, 1.0f,    // Color
-    // 3 - Vertex
-    0.5f, 0.5f, 0.0f,  // Top right vertex position
+    // FF Second triangle
+    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    0.5f, 0.5f, 0.0f,    // Top right vertex position
     1.0f, 0.0f, 0.0f,    // Color
+    -0.5f, 0.5f, 0.0f,   // Top left vertex position
+    0.0f, 0.0f, 1.0f,    // Color
+    // RF Third triangle
+    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    0.5f, 0.5f, 0.0f,    // Top right vertex position
+    1.0f, 0.0f, 0.0f,    // Color
+    0.5f, 0.5f, -0.5f,   // R Top right vertex position
+    1.0f, 0.0f, 1.0f,    // Color
+    // RF Forth triangle
+    0.5f, -0.5f, 0.0f,   // bottom Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    0.5f, 0.5f, -0.5f,   // R Top right vertex position
+    1.0f, 1.0f, 0.0f,    // Color
+    0.5f, -0.5f, -0.5f,  // R bottom Right vertex position
+    0.0f, 1.0f, 1.0f,    // Color
+    // BF Fifth triangle
+    0.5f, 0.5f, -0.5f,   // R Top right vertex position
+    1.0f, 1.0f, 0.0f,    // Color
+    0.5f, -0.5f, -0.5f,  // R bottom Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    -0.5f, 0.5f, -0.5f,  // B Top right vertex position
+    1.0f, 1.0f, 0.0f,    // Color
+    // BF Sixth triangle
+    0.5f, -0.5f, -0.5f,  // R bottom Right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    -0.5f, 0.5f, -0.5f,  // B Top right vertex position
+    1.0f, 0.0f, 0.0f,    // Color
+    -0.5f, -0.5f, -0.5f, // B Bottom right vertex position
+    0.0f, 1.0f, 0.0f,    // Color
+    // BF Seventh triangle
+    -0.5f, 0.5f, -0.5f,  // B Top right vertex position
+    1.0f, 0.0f, 0.8f,    // Color
+    -0.5f, -0.5f, -0.5f, // B Bottom right vertex position
+    0.0f, 1.0f, 0.1f,    // Color
+    -0.5f, 0.5f, 0.0f,   // Top left vertex position
+    0.0f, 0.0f, 1.0f,    // Color
+    // BF Eight triangle
+    -0.5f, 0.5f, 0.0f,   // Top left vertex position
+    0.0f, 0.0f, 1.0f,    // Color
+    -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
+    1.0f, 0.0f, 0.0f,    // Color
+    -0.5f, -0.5f, -0.5f, // B Bottom right vertex position
+    0.0f, 1.0f, 1.0f,    // Color
   };
 
   //VAO
@@ -281,12 +327,6 @@ void vertexSpecification(){
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
   glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GL_FLOAT), vertexData.data(), GL_STATIC_DRAW);
-
-  const std::vector<GLuint> indexBufferData {2,0,1,3,2,1};
-  //IBO i.e (EBO)
-  glGenBuffers(1, &gIndexBufferObject);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferData.size() * sizeof(GLuint), indexBufferData.data(), GL_STATIC_DRAW);
 
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
