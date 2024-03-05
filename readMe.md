@@ -1,2 +1,2 @@
-### This is an example of a rendering cube using Index Buffer object strategy
+### This is an example of a View projection and movement matrices
 

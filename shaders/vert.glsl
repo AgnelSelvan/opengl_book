@@ -7,9 +7,10 @@ out vec3 v_vertexColors;
 
 uniform mat4 uModelMatrix; // Uniform Variable
 uniform mat4 uPerspectiveMatrix; // Uniform Variable
+uniform mat4 uViewMatrix; // Uniform Variable
 
 void main(){
     v_vertexColors = vertexColors;
-    vec4 newPosition = uPerspectiveMatrix * uModelMatrix * vec4(position, 1.0f);
+    vec4 newPosition = uPerspectiveMatrix * uViewMatrix * uModelMatrix * vec4(position, 1.0f);
     gl_Position = newPosition;
 }

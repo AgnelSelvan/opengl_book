@@ -5,6 +5,8 @@
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "camera.hpp"
+
 int gScreenWidth = 500;
 int gScreenHeight = 300;
 SDL_Window* gGraphicsApplicationWindow = nullptr;
@@ -18,9 +20,10 @@ GLuint gVertexBufferObject = 0;
 GLuint gIndexBufferObject = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 //Uniform Variables
-float gUOffset = 0.;
+float gUOffset = -0.5;
 float gURotate = 0.;
 float gUScale = 0.2;
+Camera gCamera;
 
 // Error Handling
 //Clear all the error
@@ -140,6 +143,8 @@ void initializeProgram(){
 
 // Handle User input event on window open
 void input(){
+  int mouseX = gScreenWidth/2;
+  int mouseY = gScreenHeight/2;
   SDL_Event e;
   while (SDL_PollEvent(&e)!=0)
   {
@@ -147,22 +152,26 @@ void input(){
     if(e.type == SDL_QUIT){
       std::cout << "Bubyee!!" << std::endl;
       gQuit = true;
+    }else if(e.type == SDL_MOUSEMOTION){
+      mouseX = e.motion.xrel;
+      mouseY = e.motion.yrel;
+      gCamera.mouseLook(mouseX, mouseY);
     }
   }
-
+  float speed = 0.0001f;
   const Uint8 *state = SDL_GetKeyboardState(NULL);
   if(state[SDL_SCANCODE_UP]){
-    gUOffset += 0.0001;
+    gCamera.moveForward(speed);
   }
   if(state[SDL_SCANCODE_DOWN]){
-    gUOffset -= 0.0001;
+    gCamera.moveBackward(speed);
   }
 
   if(state[SDL_SCANCODE_LEFT]){
-    gURotate += 0.01;
+    gCamera.moveLeft(speed);
   }
   if(state[SDL_SCANCODE_RIGHT]){
-    gURotate -= 0.01;
+    gCamera.moveRight(speed);
   }
 
   if(state[SDL_SCANCODE_A]){
@@ -189,6 +198,9 @@ void preDraw(){
   // Using rhe Shader Program
   glUseProgram(gGraphicsPipelineShaderProgram);
 
+  // Rotating automatically 
+  gURotate += 0.01;
+
   const GLchar* uniformName = "uModelMatrix";
   // Getting Uniform Location from Shader
   GLint mModelMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, uniformName);
@@ -202,6 +214,20 @@ void preDraw(){
     // Passing World space cordinates to Shader
     // Uniform is useful for passing data from CPU directly to GPU
     glUniformMatrix4fv(mModelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  }else{
+    std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  glm::mat4 view = gCamera.getViewMatrix();
+  // Uniform name as defined in shader
+  uniformName = "uViewMatrix";
+  // Getting Uniform Location from Shader
+  GLint viewMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, uniformName);
+  // If location found
+  if(viewMatrixLocation >= 0){
+    // Passing the projectioin matrix to Vertex shader
+    glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &view[0][0]);
   }else{
     std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
     exit(EXIT_FAILURE);
@@ -234,6 +260,8 @@ void draw(){
 
 // Main Game Engine Entry point
 void mainLoop(){
+  SDL_WarpMouseInWindow(gGraphicsApplicationWindow, gScreenWidth/2, gScreenHeight/2);
+  SDL_SetRelativeMouseMode(SDL_TRUE);
   while (!gQuit)
   {
     // resposible for checking user inputs
@@ -271,13 +299,13 @@ void vertexSpecification(){
     0.5f, -0.5f, 0.0f,   // bottom Right vertex position
     0.0f, 1.0f, 0.0f,    // Color
     // Back Face
-    -0.5f, 0.5f, -0.5f,  // B Top left vertex position
+    -0.5f, 0.5f, -1.f,  // B Top left vertex position
     1.0f, 1.0f, 0.0f,    // Color
-    0.5f, 0.5f, -0.5f,   // B Top right vertex position
+    0.5f, 0.5f, -1.f,   // B Top right vertex position
     1.0f, 0.0f, 1.0f,    // Color
-    -0.5f, -0.5f, -0.5f, // B Bottom left vertex position
+    -0.5f, -0.5f, -1.f, // B Bottom left vertex position
     0.0f, 1.0f, 0.0f,    // Color
-    0.5f, -0.5f, -0.5f,  // B bottom Right vertex position
+    0.5f, -0.5f, -1.f,  // B bottom Right vertex position
     0.0f, 1.0f, 1.0f,    // Color
   };
 
