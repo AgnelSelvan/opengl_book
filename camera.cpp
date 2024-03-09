@@ -18,7 +18,7 @@ glm::mat4 Camera::getViewMatrix() const {
 void Camera::mouseLook(int mouseX, int mouseY){
     glm::vec2 currentMouse = glm::vec2(mouseX, mouseY);
     glm::vec2 deltaMouse = mOldMousePosition-currentMouse;
-    std::cout << "Mouse position X:" << deltaMouse.x << " Y: " << deltaMouse.y << " mViewDirection: " << glm::to_string(mViewDirection) << " mUpVector: "<< glm::to_string(mUpVector) << std::endl;
+    // std::cout << "Mouse position X:" << deltaMouse.x << " Y: " << deltaMouse.y << " mViewDirection: " << glm::to_string(mViewDirection) << " mUpVector: "<< glm::to_string(mUpVector) << std::endl;
     mViewDirection = glm::rotate(mViewDirection, glm::radians((float)mouseX), mUpVector);
     mOldMousePosition = currentMouse;
 }

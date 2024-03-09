@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #define GLM_ENABLE_EXPERIMENTA
 #include <iostream>
 #include <SDL2/SDL.h>
@@ -6,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
+#include "stb_image.h"
 
 int gScreenWidth = 500;
 int gScreenHeight = 300;
@@ -18,6 +20,8 @@ GLuint gVertexArrayObject = 0;
 GLuint gVertexBufferObject = 0;
 //IBO
 GLuint gIndexBufferObject = 0;
+//Texture
+GLuint gTexture = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 //Uniform Variables
 float gUOffset = -0.5;
@@ -148,6 +152,11 @@ void input(){
   SDL_Event e;
   while (SDL_PollEvent(&e)!=0)
   {
+    if(e.type == SDL_KEYDOWN){
+      if(e.key.keysym.sym == SDLK_ESCAPE){
+        gQuit = true;
+      }
+    }
     //e.type: 768 means on click escape
     if(e.type == SDL_QUIT){
       std::cout << "Bubyee!!" << std::endl;
@@ -247,21 +256,20 @@ void preDraw(){
     std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
     exit(EXIT_FAILURE);
   }
-
 }
 
 void draw(){
+  glBindTexture(GL_TEXTURE_2D, gTexture);
   // Binds Vertex Array Objects
   glBindVertexArray(gVertexArrayObject);
   // Draws the triangle
-  // glDrawArrays(GL_TRIANGLES, 0, 24);
-  glCheck(glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0));
+  glCheck(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0));
 }
 
 // Main Game Engine Entry point
 void mainLoop(){
-  SDL_WarpMouseInWindow(gGraphicsApplicationWindow, gScreenWidth/2, gScreenHeight/2);
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+  // SDL_WarpMouseInWindow(gGraphicsApplicationWindow, gScreenWidth/2, gScreenHeight/2);
+  // SDL_SetRelativeMouseMode(SDL_TRUE);
   while (!gQuit)
   {
     // resposible for checking user inputs
@@ -292,21 +300,29 @@ void vertexSpecification(){
     // Front Face
     -0.5f, 0.5f, 0.0f,   // Top left vertex position
     0.0f, 0.0f, 1.0f,    // Color
+    0.f, 1.f,            // Texture cordinates
     0.5f, 0.5f, 0.0f,    // Top right vertex position
     1.0f, 0.0f, 0.0f,    // Color
+    1.f, 1.f,            // Texture cordinates
     -0.5f, -0.5f, 0.0f,  // bottom Left vertex position
     1.0f, 0.0f, 0.0f,    // Color
+    0.f, 0.f,            // Texture cordinates
     0.5f, -0.5f, 0.0f,   // bottom Right vertex position
     0.0f, 1.0f, 0.0f,    // Color
+    1.f, 0.f,            // Texture cordinates
     // Back Face
-    -0.5f, 0.5f, -1.f,  // B Top left vertex position
+    -0.5f, 0.5f, -1.f,   // B Top left vertex position
     1.0f, 1.0f, 0.0f,    // Color
-    0.5f, 0.5f, -1.f,   // B Top right vertex position
+    0.f, 1.f,            // Texture cordinates
+    0.5f, 0.5f, -1.f,    // B Top right vertex position
     1.0f, 0.0f, 1.0f,    // Color
-    -0.5f, -0.5f, -1.f, // B Bottom left vertex position
+    1.f, 1.f,            // Texture cordinates
+    -0.5f, -0.5f, -1.f,  // B Bottom left vertex position
     0.0f, 1.0f, 0.0f,    // Color
-    0.5f, -0.5f, -1.f,  // B bottom Right vertex position
+    0.f, 0.f,            // Texture cordinates
+    0.5f, -0.5f, -1.f,   // B bottom Right vertex position
     0.0f, 1.0f, 1.0f,    // Color
+    1.f, 0.f,            // Texture cordinates
   };
 
   //VAO
@@ -328,11 +344,37 @@ void vertexSpecification(){
     //Right
     1,5,3,5,3,7,
     //Left
-    0,4,2,4,2,6  
+    0,4,2,4,2,6,
+    //TOP
+    0,1,4,1,4,5,
+    //Bottom
+    2,3,6,3,6,7,
   };
   glGenBuffers(1, &gIndexBufferObject);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferData.size() * sizeof(GLuint), indexBufferData.data(), GL_STATIC_DRAW);
+
+  // Binding Textures
+  glGenTextures(1, &gTexture);
+  glBindTexture(GL_TEXTURE_2D, gTexture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  int width, height, nrChannels;
+  // Loading images and assigning width, height and color channels to variables
+  unsigned char *data = stbi_load("./images/wall.jpg", &width, &height, &nrChannels, 0);
+
+  if(data){
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }else{
+    std::cout << "Failed to load texture" << std::endl;
+  }
+  // After loading image on GPU clearing the image from CPU
+  stbi_image_free(data);
 
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
@@ -341,13 +383,16 @@ void vertexSpecification(){
     3,
     GL_FLOAT,
     GL_FALSE,
-    sizeof(GL_FLOAT) * 6,
+    sizeof(GL_FLOAT) * 8,
     (void*)0
   );
  
   // Loading color buffer on 1 location on vertex shader
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT)*6, (void*)(sizeof(GL_FLOAT) * 3));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT)*8, (void*)(sizeof(GL_FLOAT) * 3));
+
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT)*8, (void*)(sizeof(GL_FLOAT) * 6));
 
   glBindVertexArray(0);
   glDisableVertexAttribArray(0);
