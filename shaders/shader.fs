@@ -15,6 +15,6 @@ void main()
     coord = (coord - 0.5) * mat2(cosFactor, sinFactor, -sinFactor, cosFactor);
     coord += 0.5;
 
-    FragColor = mix(texture(texture1, textureCoord), texture(texture2, coord), vec4(ourColor, 1.0));
+    FragColor = mix(texture(texture1, textureCoord), texture(texture2, coord), vec4(vec3(0.5), 1.0));
 
 }
