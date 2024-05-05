@@ -37,7 +37,7 @@ class Shader{
             }
             catch(const std::exception& e)
             {
-                std::cerr<< "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ " << e.what() << '\n';
+                std::cerr<< "ERROR::SHADER" << vertexPath << "::FILE_NOT_SUCCESFULLY_READ " << e.what() << '\n';
             }
 
             const char* vShaderCode = vertexCode.c_str();
@@ -88,6 +88,14 @@ class Shader{
         { 
             glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, a);
         } 
+        void setVec3(const std::string &name, float x, float y, float z) const
+        { 
+            glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
+        } 
+        void setMat4(const std::string &name, const glm::mat4 &mat) const
+        {
+            glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+        }
 
     private:
         void checkCompileError(GLuint shader, std::string type){
@@ -99,7 +107,7 @@ class Shader{
                 if(!success)
                 {
                     glGetShaderInfoLog(shader, 512, NULL, infoLog);
-                    std::cout << "ERROR::SHADER::"<< type <<"::COMPILATION_FAILED\n" << infoLog << std::endl;
+                    std::cout << "ERROR::SHADER::" << type <<"::COMPILATION_FAILED\n" << infoLog << std::endl;
                 };
             }else{
                 glGetProgramiv(ID, GL_LINK_STATUS, &success);
