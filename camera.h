@@ -25,10 +25,10 @@ class Camera{
         glm::vec3 up;
         glm::vec3 right;
         glm::vec3 worldUp;
-        
+
         float yaw;
         float pitch;
-        
+
         float movementSpeed;
         float zoom;
         float mouseSensitivity;

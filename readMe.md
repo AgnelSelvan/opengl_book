@@ -1,1 +1,1 @@
-# Creating 3D Cube and performing rotation and translation with Camera movement
+# Ambient, Diffuse, Specular lighting
