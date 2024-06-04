@@ -40,7 +40,7 @@ int main()
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Playground", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -146,13 +146,22 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightPos.z = 1.f + sin(glfwGetTime()) * 2.f;
-        lightPos.y = cos(glfwGetTime()) ;
+        lightPos.y = cos(glfwGetTime())* 2.f ;
 
         lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.f, 0.2f, .31f);
+        lightingShader.setVec3("objectColor", 1.f, 0.84f, 0.f);
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);
         lightingShader.setVec3("viewPos", camera.position.x, camera.position.y, camera.position.z);
+        lightingShader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+
+        // Cube 1
+        lightingShader.setVec3("material.ambient", 0.0215f, 0.1745f, 0.0215f);
+        lightingShader.setVec3("material.diffuse", 0.07568, 0.61424, 0.07568);
+        lightingShader.setVec3("material.specular", 0.633, 0.727811, 0.633);
+        lightingShader.setFloat("material.shininess", 0.6f);
+        lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -162,9 +171,48 @@ int main()
 
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.f));
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(1.0f, 1.0f, 0.0f));
         lightingShader.setMat4("model", model);
 
-        // render the cube
+        // render the 1 cube
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // Cube 2
+        lightingShader.setVec3("material.ambient", 0.19225,	0.19225,	0.19225);
+        lightingShader.setVec3("material.diffuse", 0.50754,	0.50754,	0.50754);
+        lightingShader.setVec3("material.specular", 0.508273,	0.508273,	0.508273);
+        lightingShader.setFloat("material.shininess", 0.4);
+        lightingShader.setVec3("light.ambient", 0.8f, 0.8f, 0.8f);
+        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("light.specular", 0.7f, 0.7f, 0.7f);
+
+        // world transformation
+        model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+        lightingShader.setMat4("model", model);
+
+        // render the 2 cube
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // Cube 3
+        lightingShader.setVec3("material.ambient",0.0,	0.05,	0.05);
+        lightingShader.setVec3("material.diffuse", 0.4,	0.5,	0.5);
+        lightingShader.setVec3("material.specular", 0.04,	0.7,	0.7);
+        lightingShader.setFloat("material.shininess", 0.078125);
+        lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // world transformation
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -1.5f, 0.f));
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(40.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+        lightingShader.setMat4("model", model);
+
+        // render the 3 cube
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 

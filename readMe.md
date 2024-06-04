@@ -1,1 +1,1 @@
-# Ambient, Diffuse, Specular lighting
+# Added Materials to Cube and code refactoring.
