@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        ".fantomasignore": "ignore",
         "__bit_reference": "cpp",
         "__config": "cpp",
         "__debug": "cpp",
@@ -54,6 +55,7 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "execution": "cpp"
     }
 }

@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include<glad/glad.h>
 #include <fstream>
+#include <vector>
 
 int gScreenWidth = 500;
 int gScreenHeight = 300;
@@ -33,7 +34,7 @@ std::string loadShaderAsString(const std::string& filename){
 
 GLuint compileShader(GLuint type, const std::string& shaderSource){
   GLuint shaderObject = glCreateShader(type);
-  
+
   const char* src = shaderSource.c_str();
   glShaderSource(shaderObject, 1, &src, nullptr);
   glCompileShader(shaderObject);
@@ -123,13 +124,13 @@ void input(){
       gQuit = true;
     }
   }
-  
+
 }
 
 void preDraw(){
   // Making the OpenGL Viewport as per the window created
   glViewport(0, 0, gScreenWidth, gScreenHeight);
-  
+
   // RGBA values, Used for clearing the buffer color values
   glClearColor(1.f, 1.f, 0.f, 1.f);
   // Clear the buffer values
@@ -165,7 +166,7 @@ void mainLoop(){
     // Swapping background Frame to current frame
     SDL_GL_SwapWindow(gGraphicsApplicationWindow);
   }
-  
+
 }
 
 void cleanUp(){
@@ -195,7 +196,7 @@ void vertexSpecification(){
   //VAO
   glGenVertexArrays(1, &gVertexArrayObject);
   glBindVertexArray(gVertexArrayObject);
-  
+
   //VBO
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
@@ -210,14 +211,14 @@ void vertexSpecification(){
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(
-    0, 
+    0,
     3,
     GL_FLOAT,
     GL_FALSE,
     sizeof(GL_FLOAT) * 6,
     (void*)0
   );
- 
+
   // Loading color buffer on 1 location on vertex shader
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT)*6, (void*)(sizeof(GL_FLOAT) * 3));
@@ -235,7 +236,7 @@ int main(int argc, char const *argv[])
   initializeProgram();
   // Responsible for loading the data from CPU to Graphics Memory that can be vertex, texture data, color and etc
   vertexSpecification();
-  // responsible for setting the Graphics pipeling. 
+  // responsible for setting the Graphics pipeling.
   // Loading the shaders stuffs, creting program and etc
   createGraphicsPipeline();
   // responsible for painting on the screen
