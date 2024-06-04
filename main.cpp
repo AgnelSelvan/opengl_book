@@ -5,6 +5,7 @@
 #include<glad/glad.h>
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 
 #include "camera.hpp"
 #include "stb_image.h"
@@ -64,7 +65,7 @@ std::string loadShaderAsString(const std::string& filename){
 
 GLuint compileShader(GLuint type, const std::string& shaderSource){
   GLuint shaderObject = glCreateShader(type);
-  
+
   const char* src = shaderSource.c_str();
   glShaderSource(shaderObject, 1, &src, nullptr);
   glCompileShader(shaderObject);
@@ -193,13 +194,13 @@ void input(){
       gUScale -= 0.0001;
     }
   }
-  
+
 }
 
 void preDraw(){
   // Making the OpenGL Viewport as per the window created
   glViewport(0, 0, gScreenWidth, gScreenHeight);
-  
+
   // RGBA values, Used for clearing the buffer color values
   glClearColor(0.f, 0.f, 0.f, 1.f);
   // Clear the buffer values
@@ -207,7 +208,7 @@ void preDraw(){
   // Using rhe Shader Program
   glUseProgram(gGraphicsPipelineShaderProgram);
 
-  // Rotating automatically 
+  // Rotating automatically
   gURotate += 0.01;
 
   const GLchar* uniformName = "uModelMatrix";
@@ -217,7 +218,7 @@ void preDraw(){
   glm::mat4 model = glm::translate(glm::mat4(1.), glm::vec3(0., 0., gUOffset));
   model = glm::rotate(model, glm::radians(gURotate), glm::vec3(0., 1., 0.));
   model = glm::scale(model, glm::vec3(gUScale));
-  
+
   // If location found
   if(mModelMatrixLocation >= 0){
     // Passing World space cordinates to Shader
@@ -241,7 +242,7 @@ void preDraw(){
     std::cout << "Location not found! Please check " << uniformName << " is spelled correctly" << std::endl;
     exit(EXIT_FAILURE);
   }
-  
+
   // Uniform name as defined in shader
   uniformName = "uPerspectiveMatrix";
   // perspective projection
@@ -284,7 +285,7 @@ void mainLoop(){
     // Swapping background Frame to current frame
     SDL_GL_SwapWindow(gGraphicsApplicationWindow);
   }
-  
+
 }
 
 void cleanUp(){
@@ -328,7 +329,7 @@ void vertexSpecification(){
   //VAO
   glGenVertexArrays(1, &gVertexArrayObject);
   glBindVertexArray(gVertexArrayObject);
-  
+
   //VBO
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
@@ -358,7 +359,7 @@ void vertexSpecification(){
   glGenTextures(1, &gTexture);
   glBindTexture(GL_TEXTURE_2D, gTexture);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -379,14 +380,14 @@ void vertexSpecification(){
   // Loading position buffer on 0 location vertex shader
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(
-    0, 
+    0,
     3,
     GL_FLOAT,
     GL_FALSE,
     sizeof(GL_FLOAT) * 8,
     (void*)0
   );
- 
+
   // Loading color buffer on 1 location on vertex shader
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT)*8, (void*)(sizeof(GL_FLOAT) * 3));
@@ -407,7 +408,7 @@ int main(int argc, char const *argv[])
   initializeProgram();
   // Responsible for loading the data from CPU to Graphics Memory that can be vertex, texture data, color and etc
   vertexSpecification();
-  // responsible for setting the Graphics pipeling. 
+  // responsible for setting the Graphics pipeling.
   // Loading the shaders stuffs, creting program and etc
   createGraphicsPipeline();
   // responsible for painting on the screen
