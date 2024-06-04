@@ -2,6 +2,9 @@
 ### This repository is the documentation of my OpenGL Journey.
 If you are a beginner and looking forward to learn OpenGL Please refer this repository's branch. Each line on the file is well documented. Incase any query raise up an issue, I will be open to answer.
 
+- [Adding Different Materials to Cubes.](https://github.com/AgnelSelvan/opengl_book/tree/25)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/25/outputs/1.gif?raw=true">
+
 - [This is an example of creating a new window using GLFW and paint to screen](https://github.com/AgnelSelvan/opengl_documentation/tree/01)
 - [This is an example of creating a simple triangle using GLFW, OpenGL, and shaders](https://github.com/AgnelSelvan/opengl_documentation/tree/02)
 - [This is an example of creating a new window using SDL2 and OpenGL Setup](https://github.com/AgnelSelvan/opengl_documentation/tree/03)
