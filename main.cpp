@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include<glad/glad.h>
+#include <vector>
 
 int gScreenWidth = 500;
 int gScreenHeight = 300;
@@ -13,14 +14,14 @@ GLuint gVertexArrayObject = 0;
 GLuint gVertexBufferObject = 0;
 GLuint gGraphicsPipelineShaderProgram = 0;
 
-const std::string gVertexShaderSource = 
+const std::string gVertexShaderSource =
   "#version 410 core\n"
   "in vec4 position;\n"
   "void main(){\n"
     "gl_Position = vec4(position.x, position.y, position.z, position.w);\n"
   "}\n";
 
-const std::string gFragmentShaderSource = 
+const std::string gFragmentShaderSource =
   "#version 410 core\n"
   "out vec4 color;\n"
   "void main(){\n"
@@ -29,7 +30,7 @@ const std::string gFragmentShaderSource =
 
 GLuint compileShader(GLuint type, const std::string& shaderSource){
   GLuint shaderObject = glCreateShader(type);
-  
+
   const char* src = shaderSource.c_str();
   glShaderSource(shaderObject, 1, &src, nullptr);
   glCompileShader(shaderObject);
@@ -116,13 +117,13 @@ void input(){
       gQuit = true;
     }
   }
-  
+
 }
 
 void preDraw(){
   // Making the OpenGL Viewport as per the window created
   glViewport(0, 0, gScreenWidth, gScreenHeight);
-  
+
   // RGBA values, Used for clearing the buffer color values
   glClearColor(1.f, 1.f, 0.f, 1.f);
   // Clear the buffer values
@@ -157,7 +158,7 @@ void mainLoop(){
     // Swapping background Frame to current frame
     SDL_GL_SwapWindow(gGraphicsApplicationWindow);
   }
-  
+
 }
 
 void cleanUp(){
@@ -178,7 +179,7 @@ void vertexSpecification(){
   //VAO
   glGenVertexArrays(1, &gVertexArrayObject);
   glBindVertexArray(gVertexArrayObject);
-  
+
   //VBO
   glGenBuffers(1, &gVertexBufferObject);
   glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
@@ -186,7 +187,7 @@ void vertexSpecification(){
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(
-    0, 
+    0,
     3,
     GL_FLOAT,
     GL_FALSE,
@@ -205,7 +206,7 @@ int main(int argc, char const *argv[])
   initializeProgram();
   // Responsible for loading the data from CPU to Graphics Memory that can be vertex, texture data, color and etc
   vertexSpecification();
-  // responsible for setting the Graphics pipeling. 
+  // responsible for setting the Graphics pipeling.
   // Loading the shaders stuffs, creting program and etc
   createGraphicsPipeline();
   // responsible for painting on the screen
