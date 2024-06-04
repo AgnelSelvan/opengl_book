@@ -150,6 +150,7 @@ void input(){
   }
 
   const Uint8 *state = SDL_GetKeyboardState(NULL);
+  std::cout << state << std::endl;
   if(state[SDL_SCANCODE_UP]){
     gUOffset += 0.0001;
   }
