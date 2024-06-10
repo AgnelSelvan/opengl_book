@@ -2,6 +2,9 @@
 ### This repository is the documentation of my OpenGL Journey.
 If you are a beginner and looking forward to learning OpenGL you can refer to this repository's branch.
 
+- [26. Added ImGUI for configuring the cube more dynamically.](https://github.com/AgnelSelvan/opengl_book/tree/26)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/26/outputs/1.gif?raw=true">
+
 - [25. Adding Different Materials to Cubes.](https://github.com/AgnelSelvan/opengl_book/tree/25)
 <img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/25/outputs/1.gif?raw=true">
 
