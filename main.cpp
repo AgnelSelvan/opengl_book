@@ -263,7 +263,8 @@ int main()
         lightingShader.setVec3("objectColor", 1.f, 0.84f, 0.f);
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("viewPos", camera.position.x, camera.position.y, camera.position.z);
-        lightingShader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+        // lightingShader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+        lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.setFloat("time", currentFrame);
 
         // world transformation

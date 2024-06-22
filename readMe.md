@@ -1,3 +1,3 @@
-# Lighting maps learning more about diffuse map, specular map and emission map.
+# Directional Light
 
 <img src="./outputs/1.gif">
