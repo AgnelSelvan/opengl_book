@@ -53,6 +53,19 @@ struct Cube{
     uint32_t id;
 };
 
+glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 Cube getEmptyCubeObject(){
     Material material;
     material.ambient = glm::vec3(0.0215f, 0.1745f, 0.0215f);
@@ -68,7 +81,9 @@ Cube getEmptyCubeObject(){
     Cube cube;
     cube.material = material;
     cube.light = light;
-    cube.position = glm::vec3(0.0f, 1.5f, 0.f);
+    int index = rand() % 10;
+
+    cube.position = cubePositions[index];
     cube.id = rand() % 100;
 
     return cube;
@@ -263,8 +278,8 @@ int main()
         lightingShader.setVec3("objectColor", 1.f, 0.84f, 0.f);
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("viewPos", camera.position.x, camera.position.y, camera.position.z);
-        // lightingShader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
-        lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        lightingShader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+        // lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.setFloat("time", currentFrame);
 
         // world transformation
@@ -283,10 +298,13 @@ int main()
             lightingShader.setVec3("light.ambient", cube.light.ambient.x, cube.light.ambient.y, cube.light.ambient.z);
             lightingShader.setVec3("light.diffuse", cube.light.diffuse.x, cube.light.diffuse.y, cube.light.diffuse.z);
             lightingShader.setVec3("light.specular", cube.light.specular.x, cube.light.specular.y, cube.light.specular.z);
+            lightingShader.setFloat("light.constant", 1.f);
+            lightingShader.setFloat("light.linear", 0.09f);
+            lightingShader.setFloat("light.quadratic", 0.032f);
 
 
             model = glm::translate(model, glm::vec3(cube.position.x, cube.position.y, cube.position.z));
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             lightingShader.setMat4("model", model);
 
 
