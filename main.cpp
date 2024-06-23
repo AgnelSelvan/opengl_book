@@ -298,6 +298,10 @@ int main()
             lightingShader.setVec3("light.ambient", cube.light.ambient.x, cube.light.ambient.y, cube.light.ambient.z);
             lightingShader.setVec3("light.diffuse", cube.light.diffuse.x, cube.light.diffuse.y, cube.light.diffuse.z);
             lightingShader.setVec3("light.specular", cube.light.specular.x, cube.light.specular.y, cube.light.specular.z);
+            lightingShader.setVec3("light.position", camera.position.x, camera.position.y, camera.position.z);
+            lightingShader.setVec3("light.direction", camera.front.x, camera.front.y, camera.front.z);
+            lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(8.5f)));
+            lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
             lightingShader.setFloat("light.constant", 1.f);
             lightingShader.setFloat("light.linear", 0.09f);
             lightingShader.setFloat("light.quadratic", 0.032f);
