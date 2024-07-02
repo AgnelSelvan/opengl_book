@@ -2,6 +2,21 @@
 ### This repository is the documentation of my OpenGL Journey.
 If you are a beginner and looking forward to learning OpenGL you can refer to this repository's branch.
 
+- [31. Added Directional Light, Spotlight Light and Point light in a scene.](https://github.com/AgnelSelvan/opengl_book/tree/31)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/31/outputs/1.gif?raw=true">
+
+- [30. Spotlight.](https://github.com/AgnelSelvan/opengl_book/tree/30)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/30/outputs/1.gif?raw=true">
+
+- [29. Point Light.](https://github.com/AgnelSelvan/opengl_book/tree/29)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/29/outputs/1.gif?raw=true">
+
+- [28. Directional Light.](https://github.com/AgnelSelvan/opengl_book/tree/28)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/28/outputs/1.gif?raw=true">
+
+- [27. Lighting maps learning more about diffuse map, specular map and emission map.](https://github.com/AgnelSelvan/opengl_book/tree/27)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/27/outputs/1.gif?raw=true">
+
 - [26. Added ImGUI for configuring the cube more dynamically.](https://github.com/AgnelSelvan/opengl_book/tree/26)
 <img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/26/outputs/1.gif?raw=true">
 
