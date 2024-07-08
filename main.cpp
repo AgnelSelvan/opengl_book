@@ -12,12 +12,12 @@
 #include <list>
 #include "shader_h.h"
 #include "camera.h"
+#include "model.h"
 
 void frameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouseCallback(GLFWwindow* window, double xPos, double yPos);
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
-
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -30,69 +30,30 @@ float lastFrame = 0.f;
 
 float lastX =  SCR_WIDTH / 2.0;
 float lastY =  SCR_HEIGHT / 2.0;
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-struct Material{
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
-};
-
-struct Light{
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    glm::vec3 position;
-};
-
-struct Cube{
-    Material material;
-    Light light;
-    glm::vec3 position;
-    uint32_t id;
-};
-
-glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f,  0.0f,  0.0f),
-    glm::vec3( 2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3( 2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3( 1.3f, -2.0f, -2.5f),
-    glm::vec3( 1.5f,  2.0f, -2.5f),
-    glm::vec3( 1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f)
-};
-
-Cube getEmptyCubeObject(){
-    Material material;
-    material.ambient = glm::vec3(0.0215f, 0.1745f, 0.0215f);
-    material.diffuse = glm::vec3(0.07568, 0.61424, 0.07568);
-    material.specular = glm::vec3(0.633, 0.727811, 0.633);
-    material.shininess = 0.6f;
-
-    Light light;
-    light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
-    light.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-
-    Cube cube;
-    cube.material = material;
-    cube.light = light;
-    int index = rand() % 10;
-
-    cube.position = cubePositions[index];
-    cube.id = rand() % 100;
-
-    return cube;
-}
 bool mouseCanDrag = true;
+
+GLenum getPolygon(int polygonModeInt){
+    switch (polygonModeInt)
+    {
+    case 0:
+        return GL_LINE;
+    case 1:
+        return GL_FILL;
+    case 2:
+        return GL_POINT;
+    default:
+        return GL_FILL;
+    }
+}
 
 int main()
 {
-    std::list<Cube> cubeList;
+    //Variables
+    glm::vec3 modelTranslate(0.0f, 0.0f, 0.0f);
+    static int polygonModeInt = 0;
+    glm::vec3 tankRotate(0.0f, 0.0f, 0.0f);
+    float rotateDegree = 0.0f;
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -126,53 +87,7 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader ourShader("./shaders/shader.vs", "./shaders/shader.fs");
     Shader lightingShader("./shaders/lighting/lighting.vs", "./shaders/lighting/lighting.fs");
-
-    float vertices[] = {
-        // positions          // normals           // texture coords
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-    };
 
     // positions of the point lights
     glm::vec3 pointLightPositions[] = {
@@ -181,36 +96,6 @@ int main()
         glm::vec3(-4.0f,  2.0f, -12.0f),
         glm::vec3( 0.0f,  0.0f, -3.0f)
     };
-
-    unsigned int cubeVAO, VBO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &VBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(cubeVAO);
-    //passing postion attribute to vertex shader
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    //passing normal attribute to vertex shader
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    //passing texture attribute to vertex shader
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    //Light Cube
-    unsigned int lightCubeVAO;
-    glGenVertexArrays(1, &lightCubeVAO);
-    glBindVertexArray(lightCubeVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
 
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
@@ -223,37 +108,10 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    int width, height, nrChannels;
-    unsigned int diffuseBoxMap;
-    glGenTextures(1, &diffuseBoxMap);
-    glBindTexture(GL_TEXTURE_2D, diffuseBoxMap);
-    unsigned char *data = stbi_load("./assets/images/container2.png",&width, &height, &nrChannels, 0);
-    if(data){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    stbi_image_free(data);
-
-    unsigned int specularBoxMap;
-    glGenTextures(1, &specularBoxMap);
-    glBindTexture(GL_TEXTURE_2D, specularBoxMap);
-    data = stbi_load("./assets/images/container2_specular.png",&width, &height, &nrChannels, 0);
-    if(data){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    stbi_image_free(data);
-
-    unsigned int emissionBoxMap;
-    int nWidth, nHeight, nNrChannels;
-    glGenTextures(1, &emissionBoxMap);
-    glBindTexture(GL_TEXTURE_2D, emissionBoxMap);
-    data = stbi_load("./assets/images/emission.png",&nWidth, &nHeight, &nNrChannels, 0);
-    if(data){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    stbi_image_free(data);
+    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+    stbi_set_flip_vertically_on_load(true);
+    Model tankModel(std::filesystem::path("assets/models/tank/14077_WWII_Tank_Germany_Panzer_III_v1_L2.obj"));
+    Model backpackModel(std::filesystem::path("assets/models/backpack/backpack.obj"));
 
     while (!glfwWindowShouldClose(window))
     {
@@ -275,9 +133,6 @@ int main()
             mouseCanDrag = true;
         }
 
-        lightPos.z = 1.f + sin(glfwGetTime()) * 2.f;
-        lightPos.y = cos(glfwGetTime())* 2.f ;
-
         lightingShader.use();
         lightingShader.setInt("material.diffuse", 0);
         lightingShader.setInt("material.specular", 1);
@@ -286,9 +141,30 @@ int main()
         lightingShader.setVec3("objectColor", 1.f, 0.84f, 0.f);
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("viewPos", camera.position.x, camera.position.y, camera.position.z);
-        lightingShader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+
         // lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.setFloat("time", currentFrame);
+
+
+        // modelShader.use();
+        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera.getViewMatrix();
+        lightingShader.setMat4("projection", projection);
+        lightingShader.setMat4("view", view);
+
+        // render the loaded model
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(modelTranslate.x, modelTranslate.y, modelTranslate.z));
+        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+        lightingShader.setMat4("model", model);
+        backpackModel.draw(lightingShader, getPolygon(polygonModeInt));
+
+        glm::mat4 tankModelMatrix = glm::mat4(1.0f);
+        tankModelMatrix = glm::translate(tankModelMatrix, glm::vec3(-4.5f, -6.5f, -16.5f));
+        tankModelMatrix = glm::rotate(tankModelMatrix, -1.63f, glm::vec3(40.f, 0.f, 0.f));
+        tankModelMatrix = glm::scale(tankModelMatrix, glm::vec3(6.5f, 6.5f, 6.5f));
+        lightingShader.setMat4("model", tankModelMatrix);
+        tankModel.draw(lightingShader, getPolygon(polygonModeInt));
 
 
         // directional light
@@ -344,238 +220,37 @@ int main()
         lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
         lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
-        // world transformation
-        glm::mat4 model = glm::mat4(1.0f);
-
         // directional light
         lightingShader.setVec3("directionalLight.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.setVec3("directionalLight.ambient", 0.05f, 0.05f, 0.05f);
         lightingShader.setVec3("directionalLight.diffuse", 0.4f, 0.4f, 0.4f);
         lightingShader.setVec3("directionalLight.specular", 0.5f, 0.5f, 0.5f);
-        // point light 1
-        lightingShader.setVec3("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-        lightingShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-        lightingShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-        lightingShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.setFloat("pointLights[0].constant", 1.0f);
-        lightingShader.setFloat("pointLights[0].linear", 0.09f);
-        lightingShader.setFloat("pointLights[0].quadratic", 0.032f);
-        // point light 2
-        lightingShader.setVec3("pointLights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
-        lightingShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-        lightingShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-        lightingShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.setFloat("pointLights[1].constant", 1.0f);
-        lightingShader.setFloat("pointLights[1].linear", 0.09f);
-        lightingShader.setFloat("pointLights[1].quadratic", 0.032f);
-        // point light 3
-        lightingShader.setVec3("pointLights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-        lightingShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-        lightingShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-        lightingShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.setFloat("pointLights[2].constant", 1.0f);
-        lightingShader.setFloat("pointLights[2].linear", 0.09f);
-        lightingShader.setFloat("pointLights[2].quadratic", 0.032f);
-        // point light 4
-        lightingShader.setVec3("pointLights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
-        lightingShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-        lightingShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-        lightingShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.setFloat("pointLights[3].constant", 1.0f);
-        lightingShader.setFloat("pointLights[3].linear", 0.09f);
-        lightingShader.setFloat("pointLights[3].quadratic", 0.032f);
-        // spotLight
-        lightingShader.setVec3("spotLight.position", camera.position.x, camera.position.y, camera.position.z);
-        lightingShader.setVec3("spotLight.direction", camera.front.x, camera.front.y, camera.front.z);
-        lightingShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-        lightingShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.setFloat("spotLight.constant", 1.0f);
-        lightingShader.setFloat("spotLight.linear", 0.09f);
-        lightingShader.setFloat("spotLight.quadratic", 0.032f);
-        lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-        lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
 
         // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.getViewMatrix();
+        projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.getViewMatrix();
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
 
-        for (auto &&cube : cubeList)
-        {
-            lightingShader.setFloat("material.shininess", 64.0f);
-
-            // lightingShader.setVec3("light.ambient", cube.light.ambient.x, cube.light.ambient.y, cube.light.ambient.z);
-            // lightingShader.setVec3("light.diffuse", cube.light.diffuse.x, cube.light.diffuse.y, cube.light.diffuse.z);
-            // lightingShader.setVec3("light.specular", cube.light.specular.x, cube.light.specular.y, cube.light.specular.z);
-            // lightingShader.setVec3("light.position", camera.position.x, camera.position.y, camera.position.z);
-            // lightingShader.setVec3("light.direction", camera.front.x, camera.front.y, camera.front.z);
-            // lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(8.5f)));
-            // lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-            // lightingShader.setFloat("light.constant", 1.f);
-            // lightingShader.setFloat("light.linear", 0.09f);
-            // lightingShader.setFloat("light.quadratic", 0.032f);
-
-
-            model = glm::translate(model, glm::vec3(cube.position.x, cube.position.y, cube.position.z));
-            // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            lightingShader.setMat4("model", model);
-
-
-            // bind diffuse map
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, diffuseBoxMap);
-
-            // bind specular map
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, specularBoxMap);
-
-            // bind emission map
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, emissionBoxMap);
-
-            // render the 1 cube
-            glBindVertexArray(cubeVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-        ourShader.use();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
-        ourShader.setMat4("model", model);
-
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
         ImGui::Begin("Change Settings");
-        ImGui::Text("Add or Remove Cube");
-        if(ImGui::Button("-")){
-            cubeList.pop_front();
-        }
+        ImGui::Text("Model Position");
+        ImGui::SliderFloat("X", &modelTranslate.x, -100.f, 100.f);
+        ImGui::SliderFloat("Y", &modelTranslate.y, -100.f, 100.f);
+        ImGui::SliderFloat("Z", &modelTranslate.z, -100.f, 100.f);
+
+        ImGui::Text("Polygon Mode");
+        ImGui::RadioButton("Line", &polygonModeInt, 0); ImGui::SameLine();
+        ImGui::RadioButton("Fill", &polygonModeInt, 1); ImGui::SameLine();
+        ImGui::RadioButton("Point", &polygonModeInt, 2);
+
+        ImGui::Text("Tank Rotate");
+        ImGui::SliderFloat("X", &tankRotate.x, -100.f, 100.f);
+        ImGui::SliderFloat("Y", &tankRotate.y, -100.f, 100.f);
+        ImGui::SliderFloat("Z", &tankRotate.z, -100.f, 100.f);
+        ImGui::SliderFloat("Degree", &rotateDegree, -100.f, 100.f);
+
         ImGui::SameLine();
-        ImGui::Text("%zu", cubeList.size()),
-        ImGui::SameLine();
-        if(ImGui::Button("+")){
-            cubeList.push_back(getEmptyCubeObject());
-        }
-
-        for (auto &&cube : cubeList)
-        {
-            if(ImGui::CollapsingHeader("Cube")){
-                ImGui::Text("Cube Position");
-                std::string text1 = "##1" + std::to_string(cube.id);
-                std::string text2 = "##2" + std::to_string(cube.id);
-                std::string text3 = "##3" + std::to_string(cube.id);
-                ImGui::SliderFloat(text1.c_str(), &cube.position.x, -100.0f, 100.f);
-                ImGui::SliderFloat(text2.c_str(), &cube.position.y, -100.0f, 100.f);
-                ImGui::SliderFloat(text3.c_str(), &cube.position.z, -100.0f, 100.f);
-
-                if(ImGui::CollapsingHeader("Material")){
-
-                    ImGui::Text("Ambient");
-                    text1 = "##4" + std::to_string(cube.id);
-                    text2 = "##5" + std::to_string(cube.id);
-                    text3 = "##6" + std::to_string(cube.id);
-                    if(ImGui::BeginTable("Ambient", 3)){
-                        ImGui::TableNextRow();
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::SliderFloat(text1.c_str(), &cube.material.ambient.x, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::SliderFloat(text2.c_str(), &cube.material.ambient.y, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::SliderFloat(text3.c_str(), &cube.material.ambient.z, 0.f, 1.f);
-                        ImGui::EndTable();
-                    }
-
-                    ImGui::Text("Diffuse");
-                    text1 = "##7" + std::to_string(cube.id);
-                    text2 = "##8" + std::to_string(cube.id);
-                    text3 = "##9" + std::to_string(cube.id);
-                    if(ImGui::BeginTable("Diffuse", 3)){
-                        ImGui::TableNextRow();
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::SliderFloat(text1.c_str(), &cube.material.diffuse.x, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::SliderFloat(text2.c_str(), &cube.material.diffuse.y, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::SliderFloat(text3.c_str(), &cube.material.diffuse.z, 0.f, 1.f);
-                        ImGui::EndTable();
-                    }
-
-                    ImGui::Text("Specular");
-                    text1 = "##10" + std::to_string(cube.id);
-                    text2 = "##11" + std::to_string(cube.id);
-                    text3 = "##12" + std::to_string(cube.id);
-                    if(ImGui::BeginTable("Specular", 3)){
-                        ImGui::TableNextRow();
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::SliderFloat(text1.c_str(), &cube.material.specular.x, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::SliderFloat(text2.c_str(), &cube.material.specular.y, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::SliderFloat(text3.c_str(), &cube.material.specular.z, 0.f, 1.f);
-                        ImGui::EndTable();
-                    }
-
-                    ImGui::Text("Shininess");
-                    text3 = "##13" + std::to_string(cube.id);
-                    ImGui::SliderFloat(text3.c_str(), &cube.material.shininess, 0.f, 1.f);
-                }
-
-                if(ImGui::CollapsingHeader("Light")){
-                    ImGui::Text("Ambient");
-                    text1 = "##14" + std::to_string(cube.id);
-                    text2 = "##15" + std::to_string(cube.id);
-                    text3 = "##16" + std::to_string(cube.id);
-                    if(ImGui::BeginTable("Ambient", 3)){
-                        ImGui::TableNextRow();
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::SliderFloat(text1.c_str(), &cube.light.ambient.x, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::SliderFloat(text2.c_str(), &cube.light.ambient.y, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::SliderFloat(text3.c_str(), &cube.light.ambient.z, 0.f, 1.f);
-                        ImGui::EndTable();
-                    }
-
-                    ImGui::Text("Diffuse");
-                    text1 = "##17" + std::to_string(cube.id);
-                    text2 = "##18" + std::to_string(cube.id);
-                    text3 = "##19" + std::to_string(cube.id);
-                    if(ImGui::BeginTable("Diffuse", 3)){
-                        ImGui::TableNextRow();
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::SliderFloat(text1.c_str(), &cube.light.diffuse.x, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::SliderFloat(text2.c_str(), &cube.light.diffuse.y, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::SliderFloat(text3.c_str(), &cube.light.diffuse.z, 0.f, 1.f);
-                        ImGui::EndTable();
-                    }
-
-                    ImGui::Text("Specular");
-                    text1 = "##20" + std::to_string(cube.id);
-                    text2 = "##21" + std::to_string(cube.id);
-                    text3 = "##22" + std::to_string(cube.id);
-                    if(ImGui::BeginTable("Diffuse", 3)){
-                        ImGui::TableNextRow();
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::SliderFloat(text1.c_str(), &cube.light.specular.x, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::SliderFloat(text2.c_str(), &cube.light.specular.y, 0.f, 1.f);
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::SliderFloat(text3.c_str(), &cube.light.specular.z, 0.f, 1.f);
-                        ImGui::EndTable();
-                    }
-
-                }
-            }
-        }
-
 
         ImGui::End();
 
@@ -589,10 +264,6 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
-
-    glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &lightCubeVAO);
-    glDeleteBuffers(1, &VBO);
 
     glfwTerminate();
     return 0;

@@ -5,12 +5,13 @@ IMGUI_DIR=$(DIR_INCLUDE)/imgui
 
 DIR_INCLUDE=$(CURRENT_DIR)/dependencies/includes
 GLFW_LIBRARY=$(CURRENT_DIR)/dependencies/lib/GLFW/libglfw.3.3.dylib
+ASSIMP_LIBRARY=$(CURRENT_DIR)/dependencies/lib/assimp/libassimp.5.4.1.dylib
 
 ADDITIONAL=-fcolor-diagnostics -fansi-escape-codes -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework CoreFoundation -Wno-deprecated
 
 INCLUDES=-I$(DIR_INCLUDE)
 IMGUI_INCLUDES=-I$(IMGUI_DIR)
-LIBRARIES=$(GLFW_LIBRARY)
+LIBRARIES=$(GLFW_LIBRARY) $(ASSIMP_LIBRARY)
 
 GLAD=glad.c
 

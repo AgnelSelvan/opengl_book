@@ -1,3 +1,3 @@
-# Added Directional Light, Spotlight Light and Point light in a scene
+# Loading 3D Models using ASSIMP
 
 <img src="./outputs/1.gif">
