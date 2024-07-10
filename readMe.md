@@ -1,3 +1,3 @@
-# Loading 3D Models using ASSIMP
+# Depth Testing
 
 <img src="./outputs/1.gif">

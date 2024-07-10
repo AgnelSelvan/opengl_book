@@ -18,6 +18,7 @@ void frameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouseCallback(GLFWwindow* window, double xPos, double yPos);
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+unsigned int loadTexture(char const * path);
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -97,6 +98,31 @@ int main()
         glm::vec3( 0.0f,  0.0f, -3.0f)
     };
 
+
+    float planeVertices[] = {
+        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+         100.0f, -0.5f,  100.0f,  2.0f, 0.0f,
+        -100.0f, -0.5f,  100.0f,  0.0f, 0.0f,
+        -100.0f, -0.5f, -100.0f,  0.0f, 2.0f,
+
+         100.0f, -0.5f,  100.0f,  2.0f, 0.0f,
+        -100.0f, -0.5f, -100.0f,  0.0f, 2.0f,
+         100.0f, -0.5f, -100.0f,  2.0f, 2.0f
+    };
+    unsigned int planeVAO, planeVBO;
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+    unsigned int floorTexture = loadTexture("assets/images/metal.jpg");
+
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetScrollCallback(window, scrollCallback);
@@ -110,8 +136,8 @@ int main()
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     stbi_set_flip_vertically_on_load(true);
+    Model formula1Model(std::filesystem::path("assets/models/formula1/Formula 1 mesh.obj"));
     Model tankModel(std::filesystem::path("assets/models/tank/14077_WWII_Tank_Germany_Panzer_III_v1_L2.obj"));
-    Model backpackModel(std::filesystem::path("assets/models/backpack/backpack.obj"));
 
     while (!glfwWindowShouldClose(window))
     {
@@ -145,7 +171,6 @@ int main()
         // lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.setFloat("time", currentFrame);
 
-
         // modelShader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.getViewMatrix();
@@ -154,15 +179,16 @@ int main()
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(modelTranslate.x, modelTranslate.y, modelTranslate.z));
-        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+        model = glm::translate(model, glm::vec3(0, -1.07, 0));
+        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+        model = glm::rotate(model, glm::radians(rotateDegree), glm::vec3(40.f, 0.f, 0.f));
         lightingShader.setMat4("model", model);
-        backpackModel.draw(lightingShader, getPolygon(polygonModeInt));
+        formula1Model.draw(lightingShader, getPolygon(polygonModeInt));
 
         glm::mat4 tankModelMatrix = glm::mat4(1.0f);
-        tankModelMatrix = glm::translate(tankModelMatrix, glm::vec3(-4.5f, -6.5f, -16.5f));
+        tankModelMatrix = glm::translate(tankModelMatrix, glm::vec3(-4.5f, -2.5f, -16.5f));
         tankModelMatrix = glm::rotate(tankModelMatrix, -1.63f, glm::vec3(40.f, 0.f, 0.f));
-        tankModelMatrix = glm::scale(tankModelMatrix, glm::vec3(6.5f, 6.5f, 6.5f));
+        tankModelMatrix = glm::scale(tankModelMatrix, glm::vec3(2.0f, 2.0f, 2.0f));
         lightingShader.setMat4("model", tankModelMatrix);
         tankModel.draw(lightingShader, getPolygon(polygonModeInt));
 
@@ -225,6 +251,14 @@ int main()
         lightingShader.setVec3("directionalLight.ambient", 0.05f, 0.05f, 0.05f);
         lightingShader.setVec3("directionalLight.diffuse", 0.4f, 0.4f, 0.4f);
         lightingShader.setVec3("directionalLight.specular", 0.5f, 0.5f, 0.5f);
+
+        // floor
+        glBindVertexArray(planeVAO);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+        lightingShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
         // view/projection transformations
@@ -324,3 +358,37 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
     camera.processMouseScroll(static_cast<float>(yOffset));
 }
+
+unsigned int loadTexture(const char* path){
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if(data){
+        GLenum format;
+        if(nrComponents == 1)
+            format = GL_RED;
+        else if(nrComponents == 3)
+            format = GL_RGB;
+        else if(nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }else{
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+    return textureID;
+}
+
+
