@@ -2,6 +2,12 @@
 ### This repository is the documentation of my OpenGL Journey.
 If you are a beginner and looking forward to learning OpenGL you can refer to this repository's branch.
 
+- [33. Depth Testing.](https://github.com/AgnelSelvan/opengl_book/tree/33)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/33/outputs/1.gif?raw=true">
+
+- [32. Loading 3D Models using ASSIMP.](https://github.com/AgnelSelvan/opengl_book/tree/32)
+<img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/32/outputs/1.gif?raw=true">
+
 - [31. Added Directional Light, Spotlight Light and Point light in a scene.](https://github.com/AgnelSelvan/opengl_book/tree/31)
 <img width=350 src="https://github.com/AgnelSelvan/opengl_book/blob/31/outputs/1.gif?raw=true">
 
