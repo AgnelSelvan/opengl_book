@@ -70,6 +70,11 @@ float linearizeDepth(float depth){
     return (2.0 * near * far) / (far + near - z * (far - near));
 }
 
+float logisticDepth(float depth, float stepness, float offset){
+    float zValue = linearizeDepth(depth);
+    return 1.0 / (1.0 + exp(-stepness * (zValue - offset / 2.0)));
+}
+
 void main()
 {
     vec3 norm = normalize(normal);
@@ -81,8 +86,8 @@ void main()
     }
     result += calculateSpotLight(spotLight, norm, fragPos, viewDir);
 
-    float depth = linearizeDepth(gl_FragCoord.z) / far;
-    FragColor = vec4(vec3(depth) + result, 1.0);
+    float depth = logisticDepth(gl_FragCoord.z, 0.1f,  5.0f);
+    FragColor = vec4(result, 1.0) * (1.0f - depth) + vec4(depth * vec3(0.85f, 0.85f, 0.90f), 1.0);
 
 }
 
