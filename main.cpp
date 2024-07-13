@@ -52,7 +52,7 @@ int main()
 {
     //Variables
     glm::vec3 modelTranslate(0.0f, 0.0f, 0.0f);
-    static int polygonModeInt = 0;
+    static int polygonModeInt = 1;
     glm::vec3 tankRotate(0.0f, 0.0f, 0.0f);
     float rotateDegree = 0.0f;
 
@@ -87,8 +87,12 @@ int main()
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     Shader lightingShader("./shaders/lighting/lighting.vs", "./shaders/lighting/lighting.fs");
+    Shader outlineShader("./shaders/outline/outline.vs", "./shaders/outline/outline.fs");
 
     // positions of the point lights
     glm::vec3 pointLightPositions[] = {
@@ -139,6 +143,8 @@ int main()
     Model formula1Model(std::filesystem::path("assets/models/formula1/Formula 1 mesh.obj"));
     Model tankModel(std::filesystem::path("assets/models/tank/14077_WWII_Tank_Germany_Panzer_III_v1_L2.obj"));
 
+    lightingShader.use();
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -148,7 +154,7 @@ int main()
         processInput(window);
 
         glClearColor(0.85f, 0.85f, 0.90f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -159,7 +165,6 @@ int main()
             mouseCanDrag = true;
         }
 
-        lightingShader.use();
         lightingShader.setInt("material.diffuse", 0);
         lightingShader.setInt("material.specular", 1);
         lightingShader.setInt("material.emission", 2);
@@ -171,27 +176,18 @@ int main()
         // lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.setFloat("time", currentFrame);
 
-        // modelShader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.getViewMatrix();
+
+        lightingShader.use();
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0, -1.07, 0));
-        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
-        model = glm::rotate(model, glm::radians(rotateDegree), glm::vec3(40.f, 0.f, 0.f));
-        lightingShader.setMat4("model", model);
-        formula1Model.draw(lightingShader, getPolygon(polygonModeInt));
-
-        glm::mat4 tankModelMatrix = glm::mat4(1.0f);
-        tankModelMatrix = glm::translate(tankModelMatrix, glm::vec3(-4.5f, -2.5f, -16.5f));
-        tankModelMatrix = glm::rotate(tankModelMatrix, -1.63f, glm::vec3(40.f, 0.f, 0.f));
-        tankModelMatrix = glm::scale(tankModelMatrix, glm::vec3(2.0f, 2.0f, 2.0f));
-        lightingShader.setMat4("model", tankModelMatrix);
-        tankModel.draw(lightingShader, getPolygon(polygonModeInt));
-
+        // view/projection transformations
+        projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.getViewMatrix();
+        lightingShader.setMat4("projection", projection);
+        lightingShader.setMat4("view", view);
 
         // directional light
         lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
@@ -252,20 +248,47 @@ int main()
         lightingShader.setVec3("directionalLight.diffuse", 0.4f, 0.4f, 0.4f);
         lightingShader.setVec3("directionalLight.specular", 0.5f, 0.5f, 0.5f);
 
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0, -1.07, 0));
+        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+        model = glm::rotate(model, glm::radians(rotateDegree), glm::vec3(40.f, 0.f, 0.f));
+        lightingShader.setMat4("model", model);
+        formula1Model.draw(lightingShader, getPolygon(polygonModeInt));
+
+        glm::mat4 tankModelMatrix = glm::mat4(1.0f);
+        tankModelMatrix = glm::translate(tankModelMatrix, glm::vec3(-1.5f, -1.5f, -16.5f));
+        tankModelMatrix = glm::rotate(tankModelMatrix, -1.63f, glm::vec3(40.f, 0.f, 0.f));
+        tankModelMatrix = glm::scale(tankModelMatrix, glm::vec3(1.4f, 1.4f, 1.4f));
+        lightingShader.setMat4("model", tankModelMatrix);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+        tankModel.draw(lightingShader, getPolygon(polygonModeInt));
+
         // floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
-        model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(100.0f, 1.0f, 100.0f));
         lightingShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
-        // view/projection transformations
-        projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        view = camera.getViewMatrix();
-        lightingShader.setMat4("projection", projection);
-        lightingShader.setMat4("view", view);
+        outlineShader.use();
+        outlineShader.setMat4("projection", projection);
+        outlineShader.setMat4("view", view);
+
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+        outlineShader.setMat4("model", tankModelMatrix);
+        tankModel.draw(outlineShader, GL_FILL);
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glEnable(GL_DEPTH_TEST);
+
 
         ImGui::Begin("Change Settings");
         ImGui::Text("Model Position");
