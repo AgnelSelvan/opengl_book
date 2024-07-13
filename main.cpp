@@ -92,7 +92,9 @@ int main()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     Shader lightingShader("./shaders/lighting/lighting.vs", "./shaders/lighting/lighting.fs");
+    Shader textureShader("./shaders/texture/texture.vs", "./shaders/texture/texture.fs");
     Shader outlineShader("./shaders/outline/outline.vs", "./shaders/outline/outline.fs");
+    Shader blendShader("./shaders/blend/blend.vs", "./shaders/blend/blend.fs");
 
     // positions of the point lights
     glm::vec3 pointLightPositions[] = {
@@ -105,13 +107,13 @@ int main()
 
     float planeVertices[] = {
         // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-         100.0f, -0.5f,  100.0f,  2.0f, 0.0f,
+         100.0f, -0.5f,  100.0f,  1.0f, 0.0f,
         -100.0f, -0.5f,  100.0f,  0.0f, 0.0f,
-        -100.0f, -0.5f, -100.0f,  0.0f, 2.0f,
+        -100.0f, -0.5f, -100.0f,  0.0f, 1.0f,
 
-         100.0f, -0.5f,  100.0f,  2.0f, 0.0f,
-        -100.0f, -0.5f, -100.0f,  0.0f, 2.0f,
-         100.0f, -0.5f, -100.0f,  2.0f, 2.0f
+         100.0f, -0.5f,  100.0f,  1.0f, 0.0f,
+        -100.0f, -0.5f, -100.0f,  0.0f, 1.0f,
+         100.0f, -0.5f, -100.0f,  1.0f, 1.0f
     };
     unsigned int planeVAO, planeVBO;
     glGenVertexArrays(1, &planeVAO);
@@ -125,7 +127,30 @@ int main()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
 
+    float grassVertices[] = {
+        // positions          // texture Coords
+         1.0f, -0.5f,  1.0f,  1.0f, 1.0f,
+        -1.0f, -0.5f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -0.5f, -1.0f,  0.0f, 0.0f,
+
+         1.0f, -0.5f,  1.0f,  1.0f, 1.0f,
+        -1.0f, -0.5f, -1.0f,  0.0f, 0.0f,
+         1.0f, -0.5f, -1.0f,  1.0f, 0.0f
+    };
+    unsigned int grassVAO, grassVBO;
+    glGenVertexArrays(1, &grassVAO);
+    glGenBuffers(1, &grassVBO);
+    glBindVertexArray(grassVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(grassVertices), &grassVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
     unsigned int floorTexture = loadTexture("assets/images/marble.jpg");
+    unsigned int grassTexture = loadTexture("assets/images/grass.png");
 
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
@@ -250,7 +275,7 @@ int main()
 
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0, -1.07, 0));
+        model = glm::translate(model, glm::vec3(0, -1.0f, 0));
         model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
         model = glm::rotate(model, glm::radians(rotateDegree), glm::vec3(40.f, 0.f, 0.f));
         lightingShader.setMat4("model", model);
@@ -265,14 +290,40 @@ int main()
         glStencilMask(0xFF);
         tankModel.draw(lightingShader, getPolygon(polygonModeInt));
 
+        // Blend grass
+        blendShader.use();
+        textureShader.setMat4("projection", projection);
+        textureShader.setMat4("view", view);
+        glBindVertexArray(grassVAO);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.5f,  -1.0f, -1.48f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+        blendShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        textureShader.use();
+        textureShader.setMat4("projection", projection);
+        textureShader.setMat4("view", view);
+        // grass
+        glBindVertexArray(grassVAO);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-4.5f,  -1.0f, -1.48f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+        textureShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
         // floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
+        model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(100.0f, 1.0f, 100.0f));
-        lightingShader.setMat4("model", model);
+        textureShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
 
         outlineShader.use();
         outlineShader.setMat4("projection", projection);
