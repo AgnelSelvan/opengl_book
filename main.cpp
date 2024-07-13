@@ -87,7 +87,6 @@ int main()
     }
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
 
     Shader lightingShader("./shaders/lighting/lighting.vs", "./shaders/lighting/lighting.fs");
 
@@ -149,9 +148,7 @@ int main()
         processInput(window);
 
         glClearColor(0.85f, 0.85f, 0.90f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        glStencilMask(0x00);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
