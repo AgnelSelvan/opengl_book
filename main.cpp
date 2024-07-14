@@ -129,13 +129,13 @@ int main()
 
     float grassVertices[] = {
         // positions          // texture Coords
-         1.0f, -0.5f,  1.0f,  1.0f, 1.0f,
-        -1.0f, -0.5f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -0.5f, -1.0f,  0.0f, 0.0f,
+         1.0f, -2.5f,  1.0f,  1.0f, 1.0f,
+        -1.0f, -2.5f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -2.5f, -1.0f,  0.0f, 0.0f,
 
-         1.0f, -0.5f,  1.0f,  1.0f, 1.0f,
-        -1.0f, -0.5f, -1.0f,  0.0f, 0.0f,
-         1.0f, -0.5f, -1.0f,  1.0f, 0.0f
+         1.0f, -2.5f,  1.0f,  1.0f, 1.0f,
+        -1.0f, -2.5f, -1.0f,  0.0f, 0.0f,
+         1.0f, -2.5f, -1.0f,  1.0f, 0.0f
     };
     unsigned int grassVAO, grassVBO;
     glGenVertexArrays(1, &grassVAO);
