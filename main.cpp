@@ -48,6 +48,10 @@ GLenum getPolygon(int polygonModeInt){
     }
 }
 
+float randomNumber(float min, float max){
+    return min + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(max-min)));
+}
+
 int main()
 {
     //Variables
@@ -88,6 +92,7 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
+    glEnable(GL_BLEND);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
@@ -169,6 +174,14 @@ int main()
     Model tankModel(std::filesystem::path("assets/models/tank/14077_WWII_Tank_Germany_Panzer_III_v1_L2.obj"));
 
     lightingShader.use();
+
+    std::vector<glm::vec3> grassPosition = {};
+    for (size_t i = 0; i < 500; i++)
+    {
+        float x = randomNumber(-50.f, 50.f);
+        float z = randomNumber(-50.f, 50.f);
+        grassPosition.push_back(glm::vec3(x, -1.0f, z));
+    }
 
     while (!glfwWindowShouldClose(window))
     {
@@ -294,14 +307,21 @@ int main()
         blendShader.use();
         textureShader.setMat4("projection", projection);
         textureShader.setMat4("view", view);
-        glBindVertexArray(grassVAO);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-3.5f,  -1.0f, -1.48f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-        blendShader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        for (size_t i = 0; i < grassPosition.size(); i++)
+        {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glBindVertexArray(grassVAO);
+            glBindTexture(GL_TEXTURE_2D, grassTexture);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, grassPosition[i]);
+            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+            blendShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+
 
         textureShader.use();
         textureShader.setMat4("projection", projection);
