@@ -93,6 +93,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
@@ -155,6 +156,7 @@ int main()
     glBindVertexArray(0);
 
     unsigned int floorTexture = loadTexture("assets/images/marble.jpg");
+    unsigned int transparentWindow = loadTexture("assets/images/blending_transparent_window.png");
     unsigned int grassTexture = loadTexture("assets/images/grass.png");
 
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -313,7 +315,11 @@ int main()
             glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glBindVertexArray(grassVAO);
-            glBindTexture(GL_TEXTURE_2D, grassTexture);
+            if(i % 2 == 0){
+                glBindTexture(GL_TEXTURE_2D,transparentWindow);
+            }else{
+                glBindTexture(GL_TEXTURE_2D,grassTexture);
+            }
             model = glm::mat4(1.0f);
             model = glm::translate(model, grassPosition[i]);
             model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -322,19 +328,9 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
-
         textureShader.use();
         textureShader.setMat4("projection", projection);
         textureShader.setMat4("view", view);
-        // grass
-        glBindVertexArray(grassVAO);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-4.5f,  -1.0f, -1.48f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-        textureShader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // floor
         glBindVertexArray(planeVAO);
