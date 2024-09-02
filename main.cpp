@@ -170,6 +170,7 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
+
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     stbi_set_flip_vertically_on_load(true);
     Model formula1Model(std::filesystem::path("assets/models/formula1/Formula 1 mesh.obj"));
@@ -187,6 +188,7 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        glEnable(GL_CULL_FACE);
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -305,6 +307,7 @@ int main()
         glStencilMask(0xFF);
         tankModel.draw(lightingShader, getPolygon(polygonModeInt));
 
+        glDisable(GL_CULL_FACE);
         // Blend grass
         blendShader.use();
         textureShader.setMat4("projection", projection);
@@ -344,7 +347,6 @@ int main()
         outlineShader.use();
         outlineShader.setMat4("projection", projection);
         outlineShader.setMat4("view", view);
-
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
