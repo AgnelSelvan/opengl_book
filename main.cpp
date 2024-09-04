@@ -248,7 +248,6 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
