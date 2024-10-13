@@ -1,153 +1,230 @@
-# Roadmap to become Graphics Engineer
 
-#### 1. Programming Skills
-###### 1. Language
-- [x] C++
-###### 2. Concepts
-- [ ] OOPS in CPP
-- [ ] Memory Management in CPP
-- [ ] Multi-threading and parallelism in CPP
+##### 1.2.1 OOPS in C++
+Object Oriented Programming is a core paradigm in C++. Key Concepts in C++:
+###### Classes
+- Classes are basically a blueprint for creating objects. It has properties and methods that the object created from the class will have.
+```c++
+class Car{
+    public:
+        std::string brand;
+        std::string model;
+        int year;
 
-#### 2. Mathematics for Graphics
-###### 1. Linear Algebra
-- [ ] Vectors,
-- [ ] Matrices,
-- [ ] transformation (translation, rotation, scaling)
-###### 2. Geometry
-- [ ] geometric transformations
-- [ ] Curves
-- [ ] surfaces
-- [ ] polygonal meshes
-###### 3. Calculus (Animation, Lighting and ray tracing)
-- [ ] Differential equation
-- [ ] Derivatives
-- [ ] Integrals
-###### 4. Trigonometry
-- [ ] for camera systems
-- [ ] for lighting
-- [ ] for calculating angles for transformations
+    void displayInformation(){
+        std::cout << "Brand: " << brand << std::endl;
+        std::cout << "Model: " << model << std::endl;
+        std::cout << "Year: " << year << std::endl;
+    }
+};
+```
 
+###### Objects
+- Instance of a class is called as **Objects**.
+- When an instance is created, you allocate some memory for the class and you can access attributes and properties from the memory address.
+```c++
+    Car car;
+    car.brand = "Ford";
+    car.model = "Mustang";
+    car.year = 1969;
+    car.displayInformation();
+```
+###### Encapsulation
+- An attribute or method that cannot be accessed outside the class is called **Encapsulation**.
+- Instead of direct access, we can create method of *getter* and *setter* to access or update the value.
+- Access specifiers like (public, private and protected) helps in controlling the access of the method or variable in a class.
+```c++
+class Car{
+    public:
+        std::string brand;
+        ...
+        void getVIN(){
+            std::cout << "VIN: " << vin << std::endl;
+        }
 
-#### 3. Shader Programming
-###### 1. Shaders
-- [ ] GLSL
-- [ ] HLSL
-###### 2. SHADER optimization
-- [ ] Understand performance implications when writing shaders, especially for complex lighting models and large scenes.
+        void setVIN(std::string vin){
+            this->vin = vin;
+        }
 
-#### 4. Graphics Pipeline and Rendering
-###### 1. Rendering Pipeline
-- [ ] Vertex processing
-- [ ] Rasterisation
-- [ ] Fragment Processing
-- [ ] Dept Testing & Culling
-###### 2. Real-time Rendering
-- [ ] Explore Real-time rendering
-- [ ] Deferred Shading
-- [ ] Forward Rendering
-- [ ] Tile based rendering
-###### 3. Texturing
-- [ ] Understand Texture Mapping
-- [ ] UV Cordinates
-- [ ] Mipmapping
-- [ ] Procedural Textures
+    private:
+        ...
+};
 
-#### 5. 3D Rendering Development and Optimisation
-###### 1. Build a simple Game Engine
-- [ ] Practise working with Graphics pipeline, shaders, asset loading
-###### 2. Scene Graphs
-- [ ] Understand How to structure objects in scene and manage transformation
-###### 3. Optimisation Techniques
-- [ ] Level of Detail
-- [ ] Frustum
-- [ ] Occlusion Culling
-- [ ] Instancing
-- [ ] Batch Rendering
+int main(){
+    Car car;
+    car.brand = "Ford";
+    ...
 
-#### 6. Learn Lighting and Shadows
-###### 1. Lighting Models
-- [ ] Phong
-- [ ] Blinn-Phong
-- [ ] Lambertian
-- [ ] Physically-Based Rendering (PBR)
+    car.setVIN("1FATP8UH3K5159596");
+    car.getVIN();
+    return 0;
 
-###### 2. Global Illumination (For realistic rendering)
-- [ ] ray tracing
-- [ ] Path tracing
-- [ ] Radiosity
+}
+```
+###### Inheritance
+- A mechanism that allows inherit methods and properties from one class to other class is called **Inheritance**.
+```c++
+class Vehicle {
+    public:
+        void start(){
+            std::cout << "Vehicle started" << std::endl;
+        }
 
-###### 3. Shadows
-- [ ] shadow mapping
-- [ ] shadow volumes
-- [ ] Cascaded Shadow Maps
+        void stop(){
+            std::cout << "Vehicle stopped" << std::endl;
+        }
 
-#### 7. Specialize in Advanced Topics
-###### 1. Ray Tracing
-- [ ] Study real-time ray tracing using APIs like NVIDIA RTX and DirectX Raytracing (DXR).
+        void honk(){
+            std::cout << "Vehicle honked" << std::endl;
+        }
+};
 
-###### 2. Post-Processing
-- [ ] Bloom
-- [ ] Motion Blur
-- [ ] Depth of Field
-- [ ] Anti-Aliasing
+// Classes
+class Car: public Vehicle {
+    ...
+};
 
-###### 3. Volumetric Rendering
-- [ ] Volumetric lighting
-- [ ] Fog
-- [ ] Cloud to simulate Atmospheric Effects
+int main(){
+    // Objects
+    Car car;
+    car.brand = "Ford";
+    ...
+    car.start();
+    car.honk();
+    car.stop();
+    return 0;
+}
+```
 
-###### 4. Particle Systems
-- [ ] simulating fire
-- [ ] simulating smoke
-- [ ] simulating water
-- [ ] simulating magical effects
+###### Polymorphism
+- Capability to perform different behavior with same method is called **Polymorphism**.
+- **Compile-time Polymorphism:** Achieved through method overloading and operator overloading.
+```c++
+class Vehicle {
+    private:
+        double overallKMRan;
 
-###### 5. Animation Systems
-- [ ] Skeletal Animation
-- [ ] Morph targets
-- [ ] Inverse kinematics
-- [ ] Procedural animation techniques
-- [ ] Blending systems for character animations
+    public:
 
-#### 8. Physics and Simulation
-###### 1. Physics Engines
-- [ ] Understand rigid body physics
-- [ ] collision detection
-- [ ] constraint solvers
-- [ ] Explore PhysX, Bullet Physics Engine
+        void updateKMRan(double kmRan){
+            this->overallKMRan += kmRan;
+        }
 
-###### 2. GPU-Accelerated Physics
-- [ ] Compute Shaders
-- [ ] CUDA
-- [ ] OpenCL
+        void updateKMRan(int kmRan){
+            this->overallKMRan += kmRan;
+        }
 
-#### 9. Learn Optimization and Profiling
-
-###### 1. Rendering Performance
-Optimize frame rates and performance
-- [ ] occlusion culling
-- [ ] mesh simplification
-
-###### 2. GPU Profiling Tools
-- [ ] RenderDoc
-- [ ] NVIDIA Nsight
-- [ ] AMD Radeon GPU Profiler
-
-###### 3. CPU-GPU Synchronization
-- [ ] Learn how to avoid CPU-GPU bottlenecks
-- [ ] Optimize the parallel processing capabilities of modern GPUs
-
-#### 10. Stay Updated with Industry Trends
-- [ ] Ray Tracing Hardware
-- [ ] AI in Graphics
+        double getOverallKMRan(){
+            return overallKMRan;
+        }
+        ...
+};
 
 
+int main(){
+    Car car;
+    Vehicle *vehicle = &car;
+    ...
+    car.updateKMRan(100);
+    ...
+    car.updateKMRan(40);
+    ...
+    return 0;
+}
+```
+- **Run-time Polymorphism:** Achieved through virtual functions and inheritance.
 
+```c++
+class Vehicle {
+    private:
+        double overallKMRan;
 
+    public:
+        ...
+        virtual void breakdown(){
+            std::cout << "Vehicle broke down" << std::endl;
+        }
+        ...
+};
 
+// Classes
+class Car: public Vehicle {
+    public:
+       ...
+        void breakdown() override {
+            std::cout << "Car broke down" << std::endl;
+        }
+        ...
+};
 
+int main(){
+    // Objects
+    Car car;
+    Vehicle *vehicle = &car;
+    ...
+    vehicle->breakdown();
+    return 0;
+}
+```
 
+###### Abstraction
+- The concept of hiding the actual implementation if a method is called **abstraction**.
+```c++
+class Vehicle {
+    private:
+        ...
+        double speed, time;
 
+    public:
+        void setSpeed(double speed){
+            this->speed = speed;
+        }
 
+        void setTime(double time){
+            this->time = time;
+        }
 
+        double getDistanceTraveled(){
+            return speed * time;
+        }
+        ...
+};
 
+int main(){
+    ...
+    car.setSpeed(100);
+    car.setTime(2);
+    double distance = car.getDistanceTraveled();
+    std::cout << "Distance Traveled: " << distance << std::endl;
+    ...
+}
+```
+- Here, the actual implementation of distance calculation is not required to show. Hence, hiding the calculation of distance inside a method.
+
+###### Aggregation
+- Passing the object as reference to one object.
+- This means that the contained object (the one being aggregated) exists independently of the containing class.
+```cpp
+class Car: public Vehicle {
+    CarUniqueDetails carUniqueDetails;
+    public:
+        ...
+        Car( Motor* mtr) :carUniqueDetails(CarUniqueDetails()) {
+            std::cout << "Car Instance created" <<std::endl;
+            motor = mtr;
+            carUniqueDetails.setVIN("1234567890");
+        }
+        ...
+};
+```
+
+###### Composition
+- Composition represents a stronger "has-a" relationship where the contained object is owned by the containing class, and its lifetime is tied to the container class.
+- When the containing class is destroyed, the composed object is also destroyed.
+```cpp
+int main(){
+    Motor motor = Motor();
+    Car car = Car(&motor);
+    Vehicle *vehicle = &car;
+    car.displayInformation();
+}
+```
