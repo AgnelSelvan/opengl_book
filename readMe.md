@@ -2,55 +2,55 @@
 
 #### 1. Programming Skills
 ###### 1. Language
-- [x] C++
+- [x] 1. C++
 ###### 2. Concepts
-- [ ] OOPS in CPP
-- [ ] Memory Management in CPP
-- [ ] Multi-threading and parallelism in CPP
+- [ ] 1. OOPS in CPP
+- [ ] 2. Memory Management in CPP
+- [ ] 3. Multi-threading and parallelism in CPP
 
 #### 2. Mathematics for Graphics
 ###### 1. Linear Algebra
-- [ ] Vectors,
-- [ ] Matrices,
-- [ ] transformation (translation, rotation, scaling)
+- [ ] 1. Vectors,
+- [ ] 2. Matrices,
+- [ ] 3. transformation (translation, rotation, scaling)
 ###### 2. Geometry
-- [ ] geometric transformations
-- [ ] Curves
-- [ ] surfaces
-- [ ] polygonal meshes
+- [ ] 1. geometric transformations
+- [ ] 2. Curves
+- [ ] 3. surfaces
+- [ ] 4. polygonal meshes
 ###### 3. Calculus (Animation, Lighting and ray tracing)
-- [ ] Differential equation
-- [ ] Derivatives
-- [ ] Integrals
+- [ ] 1. Differential equation
+- [ ] 2. Derivatives
+- [ ] 3. Integrals
 ###### 4. Trigonometry
-- [ ] for camera systems
-- [ ] for lighting
-- [ ] for calculating angles for transformations
+- [ ] 1. for camera systems
+- [ ] 2. for lighting
+- [ ] 3. for calculating angles for transformations
 
 
 #### 3. Shader Programming
 ###### 1. Shaders
-- [ ] GLSL
-- [ ] HLSL
+- [ ] 1. GLSL
+- [ ] 2. HLSL
 ###### 2. SHADER optimization
-- [ ] Understand performance implications when writing shaders, especially for complex lighting models and large scenes.
+- [ ] 1. Understand performance implications when writing shaders, especially for complex lighting models and large scenes.
 
 #### 4. Graphics Pipeline and Rendering
 ###### 1. Rendering Pipeline
-- [ ] Vertex processing
-- [ ] Rasterisation
-- [ ] Fragment Processing
-- [ ] Dept Testing & Culling
+- [ ] 1. Vertex processing
+- [ ] 2. Rasterisation
+- [ ] 3. Fragment Processing
+- [ ] 4. Dept Testing & Culling
 ###### 2. Real-time Rendering
-- [ ] Explore Real-time rendering
-- [ ] Deferred Shading
-- [ ] Forward Rendering
-- [ ] Tile based rendering
+- [ ] 1. Explore Real-time rendering
+- [ ] 2. Deferred Shading
+- [ ] 3. Forward Rendering
+- [ ] 4. Tile based rendering
 ###### 3. Texturing
-- [ ] Understand Texture Mapping
-- [ ] UV Cordinates
-- [ ] Mipmapping
-- [ ] Procedural Textures
+- [ ] 1. Understand Texture Mapping
+- [ ] 2. UV Cordinates
+- [ ] 3. Mipmapping
+- [ ] 4. Procedural Textures
 
 #### 5. 3D Rendering Development and Optimisation
 ###### 1. Build a simple Game Engine
