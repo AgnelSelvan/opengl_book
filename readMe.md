@@ -4,9 +4,9 @@
 ###### 1. Language
 - [x] 1. C++
 ###### 2. Concepts
-- [ ] 1. OOPS in CPP
-- [ ] 2. Memory Management in CPP
-- [ ] 3. Multi-threading and parallelism in CPP
+- [x] 1. [OOPS in CPP](https://github.com/AgnelSelvan/opengl_book/tree/1.2.1)
+- [x] 2. [Memory Management in CPP](https://github.com/AgnelSelvan/opengl_book/tree/1.2.2)
+- [x] 3. [Multi-threading and parallelism in CPP](https://github.com/AgnelSelvan/opengl_book/tree/1.2.3)
 
 #### 2. Mathematics for Graphics
 ###### 1. Linear Algebra
